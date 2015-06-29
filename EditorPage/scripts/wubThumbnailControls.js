@@ -1,7 +1,10 @@
 //TODO:
-//Create proper save/load functions to convert tnPropertiesSaved to window.opener.thumbnailInfo.thumbnailProps and back
-//Issue is the "img" property, it doesn't convert properly. 
-//Need to instead save an ID back to thumbnailPropers, and convert it back into the appropriate javascript object.
+//On load, Javascript insists on copying the saved properties array by reference, even when using slice.
+//Need a deep copy to sever that link.
+//Ugh, got a silly work around in place so at least the thumbnail editor will load correctly.
+
+//Add functionality to reorder layers on thumbnail.
+//Add functionality to remove layers.
 
 (function($) {
 	// plugin definition
@@ -21,11 +24,7 @@
 			var $video_container = $(video).parent();
 			
 			var tnPropertiesDefault = [{img:video,xPos:0,yPos:0,width:options.tnWidth,height:options.tnHeight}];
-			var tnPropertiesSaved = window.opener.thumbnailInfo.thumbnailProps;
-			if (typeof tnPropertiesSaved !== 'undefined') { tnPropertiesSaved.img = video; }
-			
-			//Use stored thumbnail settings, or the defaults.
-			var tnProperties = (tnPropertiesSaved) ? tnPropertiesSaved : tnPropertiesDefault;
+			var tnProperties = [];
 			
 			
 			//create html structure
@@ -39,15 +38,16 @@
 			var $thumbnail_editor = $('<div id="ThumbnailEditorPane" style="clear:both; padding-top:5px;">' +
 										'<div>' +
 											'<canvas style="float:left;" id="ThumbnailPreview" width="'+options.tnWidth+'" height="'+options.tnHeight+'"></canvas>' +
-											'<ul style="float:left;" id="ElementList"><li index="0">Video Frame</li></ul>' +
+											'<ul style="float:left;" id="ElementList"></ul>' +
+											'<select id="ElementOptions"></select><input type="button" id="ElementAdd" value="Add" />' +
 										'</div>' +
 										'<div style="clear:both;">' +
 											'<input type="button" id="tnElLeftBtn" class="tnEditBtn" tnVal=\'{"xPos":"-1"}\' value="Left" />' +
 											'<input type="button" id="tnElRightBtn" class="tnEditBtn" tnVal=\'{"xPos":"1"}\' value="Right" />' +
 											'<input type="button" id="tnElUpBtn" class="tnEditBtn" tnVal=\'{"yPos":"-1"}\' value="Up" />' +
 											'<input type="button" id="tnElDownBtn" class="tnEditBtn" tnVal=\'{"yPos":"1"}\' value="Down" />' +
-											'<input type="button" id="tnElPlusBtn" class="tnEditBtn" tnVal=\'{"width":"'+options.tnAspectRatio+'","height":"1"}\' value="+" />' +
-											'<input type="button" id="tnElMinusBtn" class="tnEditBtn" tnVal=\'{"width":"-'+options.tnAspectRatio+'","height":"-1"}\' value="-" />' +
+											'<input type="button" id="tnElPlusBtn" class="tnEditBtn" tnVal=\'{"width":"1","height":"1"}\' value="+" />' +
+											'<input type="button" id="tnElMinusBtn" class="tnEditBtn" tnVal=\'{"width":"-1","height":"-1"}\' value="-" />' +
 										'</div>' +
 										'<div style="clear:both;">' + 
 											'<input type="button" id="ResetButton" value="Reset"/>' +
@@ -68,6 +68,8 @@
 			var $wub_thumb_Details 		= $('#ThumbnailEditorPane', $video_container.parent());
 			var $wub_thumb_Canvas		= $('#ThumbnailPreview', $video_container.parent());
 			var $wub_thumb_ElementList	= $('#ElementList', $video_container.parent());
+			var $wub_thumb_ElementOpt	= $('#ElementOptions', $video_container.parent());
+			var $wub_thumb_ElementAdd	= $('#ElementAdd', $video_container.parent());
 			var $tnElLeftBtn			= $('#tnElLeftBtn', $video_container.parent());
 			var $tnElRightBtn			= $('#tnElRightBtn', $video_container.parent());
 			var $tnElUpBtn				= $('#tnElUpBtn', $video_container.parent());
@@ -79,11 +81,18 @@
 			
 			//Configure Thumbnail Selector Controls
 			var setDefaults = function() {
-				if(video.readyState) {
+				if(video.readyState === 4) {
 					var sTime = window.opener.thumbnailInfo.thumbnailTime ? window.opener.thumbnailInfo.thumbnailTime : (video.duration/2).toFixed(2);
 					$wub_thumb_Time.val(sTime);
 					video.currentTime = sTime;
-					drawThumbnail();
+					//It takes a half second for the video to actually update to what the currentTime value is.
+					//Otherwise the thumbnail will just load at the offset position set by the video player.
+					//Find a better way to deal with this.
+					setTimeout(function() {
+						tnProperties = loadThumbnail(); 
+						drawThumbnail();
+					}, 500);
+					loadElementList();
 				} else {
 					setTimeout(setDefaults, 150);
 				}
@@ -107,28 +116,20 @@
 			$wub_thumb_Reset.click(function() {
 				$wub_thumb_Time.val((video.duration/2).toFixed(2));
 				video.currentTime = (video.duration/2).toFixed(2);
-				tnProperties = tnPropertiesDefault;
-				drawThumbnail();
+				setTimeout(function() {
+					tnProperties = tnPropertiesDefault.slice();
+					loadElementList();
+					drawThumbnail();
+				}, 500);
 			});
 			
 			$wub_thumb_Submit.click(function() {
 				//Submit the thumbnail information.
 				if(/^\d+\.?\d*$/.test($wub_thumb_Time.val())) {
-					window.opener.thumbnailInfo = { thumbnailTime:$wub_thumb_Time.val(), thumbnailProps:tnProperties};
-					window.opener.thumbnailInfo.thumbnailProps
+					saveThumbnail();
 					window.close();
 				} else {
-					alert('Invalid timestamp. Make sure the time is entered in seconds.')
-				}
-			});
-			
-			//Select element from list to modify.
-			$wub_thumb_ElementList.children('li').click(function() {
-				if($(this).hasClass('active')) {
-					$(this).removeClass('active');
-				} else {
-					$wub_thumb_ElementList.children('li').removeClass('active');
-					$(this).addClass('active');
+					alert('Invalid timestamp. Make sure the time is entered in seconds.');
 				}
 			});
 			
@@ -162,8 +163,77 @@
 				
 				//Draw the video contents into the canvas x, y, width, height
 				tnProperties.forEach(function(element) {
+					//alert(element.img.currentTime);
 					context.drawImage(element.img,element.xPos,element.yPos,element.width,element.height);
-				})
+				});
+			}
+			
+			function saveThumbnail() {
+				var saveProperties = tnProperties.slice();
+				saveProperties.forEach(function(element, index) {
+					element.img = (element.img.id == "wubPlayer") ? "Video" : element.img;
+				});
+				window.opener.thumbnailInfo = { thumbnailTime:$wub_thumb_Time.val(), thumbnailProps:saveProperties.slice()};
+			}
+			
+			function loadThumbnail() {
+				//Use stored thumbnail settings, or the defaults.
+				if (typeof window.opener.thumbnailInfo.thumbnailProps !== 'undefined') { 
+					var tnPropertiesSaved = window.opener.thumbnailInfo.thumbnailProps.slice();
+					tnPropertiesSaved.forEach(function(element, index) {
+						element.img = (element.img == "Video" || element.img.id == "wubPlayer") ? video : element.img;
+					});
+				}
+				return (tnPropertiesSaved) ? tnPropertiesSaved.slice() : tnPropertiesDefault.slice();
+			}
+			
+			function selectElement() {
+				if($(this).hasClass('active')) {
+					$(this).removeClass('active');
+				} else {
+					$wub_thumb_ElementList.children('li').removeClass('active');
+					$(this).addClass('active');
+					$tnElPlusBtn.attr('tnVal','{"width":"'+($(this).attr('elWidth')/$(this).attr('elHeight'))+'","height":"1"}');
+					$tnElMinusBtn.attr('tnVal','{"width":"-'+($(this).attr('elWidth')/$(this).attr('elHeight'))+'","height":"-1"}');
+				}
+			}
+			
+			function loadElementList() {
+				$wub_thumb_ElementList.empty();
+				$wub_thumb_ElementOpt.empty();
+				
+				
+				//Populate options list.
+				//Make options load from a json file.
+				$wub_thumb_ElementOpt.append('<option value="MattFrump.png" elWidth="17" elHeight="25">Matt Frump</option>')
+				
+				//Add option to thumbnail/element list.
+				$wub_thumb_ElementAdd.click(function() {
+					//Add to Element List.
+					var $optAdd = $(':selected', $wub_thumb_ElementOpt);
+					var optAddIndex = parseInt($wub_thumb_ElementList.find(':last').attr('index')) + 1;
+					$wub_thumb_ElementList.append('<li index="'+optAddIndex+'" value="'+$optAdd.val()+'" elWidth="'+$optAdd.attr('elWidth')+'" elHeight="'+$optAdd.attr('elHeight')+'">'+$optAdd.text()+'</li>');
+					$wub_thumb_ElementList.find(':last').click(selectElement);
+					//Add to frame.
+					tnProperties.push({img:$('<img src="/thumbnailResources/'+$optAdd.val()+'"></img>')[0],xPos:0,yPos:0,width:17,height:25});
+					drawThumbnail();
+				});
+				
+				//Add elements from saved thumbnails.
+				var populateElementList = function() {
+					if(tnProperties.length > 0) {
+						tnProperties.forEach(function(element, index) {
+							var elementTitle = (element.img.id == "wubPlayer") ? "Video Frame" : $wub_thumb_ElementOpt.find('option[value="'+element.img.src.substring(element.img.src.lastIndexOf('/')+1)+'"]').text();
+							
+							$wub_thumb_ElementList.append('<li index="'+index+'" elWidth="'+element.width+'" elHeight="'+element.height+'">'+elementTitle+'</li>');
+						});
+						//Be able to select individual elements to modify them.
+						$wub_thumb_ElementList.children('li').click(selectElement);
+					} else {
+						setTimeout(populateElementList, 150);
+					}
+				};
+				populateElementList();
 			}
 		});
 	};

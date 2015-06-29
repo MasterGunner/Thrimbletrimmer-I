@@ -29,16 +29,6 @@
 			if(window.location.search.match(/video=(.*?)(&|$)/i)) {
 				var videoID = window.location.search.match(/video=(.*?)(&|$)/i)[1];
 				$.get('/getwubs/'+videoID,function(data) { Callback(data); },'json');
-			} else {
-				var wubs = {
-					vidID:'1234',
-					src:'oceans-clip.mp4',
-					type:'video/mp4',
-					title:'Test Title',
-					description:'Test Description',
-					framerate:24
-				};
-				Callback(wubs);
 			}
 		};
 		
@@ -52,7 +42,7 @@
 			//Add Thumbnail selection/editing functionality.
 			$('#SubmitButton').before('<input type="button" id="SetThumbnail" value="Set Thumbnail"/>');
 			$('#SetThumbnail').click(function() {
-				var thumbnailEditor = window.open('ThumbnailEditor.html','Thumbnail Editor','width=800, height=600');
+				var thumbnailEditor = window.open('ThumbnailEditor.html','Thumbnail Editor','width=800, height=600, scrollbars=yes');
 				thumbnailEditor.video_source = wubs.src;
 				thumbnailEditor.video_type = wubs.type;
 				thumbnailEditor.video_framerate = wubs.framerate;

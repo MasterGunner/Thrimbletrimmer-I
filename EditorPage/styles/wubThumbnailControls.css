@@ -10,3 +10,7 @@
 #ElementList > li.active {
 	background-color: lightBlue;
 }
+
+#ElementOptions, #ElementAdd {
+	margin-left:20px;
+}

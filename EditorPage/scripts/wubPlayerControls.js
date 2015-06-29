@@ -46,7 +46,7 @@
 						orientation: "horizontal",
 						range: "min",
 						max: video_duration,
-						animate: true,					
+						animate: false,					
 						slide: function(){							
 							seeksliding = true;
 						},
