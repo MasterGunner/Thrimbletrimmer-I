@@ -16,7 +16,7 @@ app.get('/', function (req, res) {
 
 //Returns the video data.
 app.get('/getwubs/:a?', function (req, res) {
-	fs.readFile('./videolist.json', 'utf8', function (err, data) {
+	fs.readFile('../Videos/videolist.json', 'utf8', function (err, data) {
 		if (err) {
 			res.sendStatus(500);
 			return console.log(err);

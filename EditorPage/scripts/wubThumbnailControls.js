@@ -4,7 +4,7 @@
 //Ugh, got a silly work around in place so at least the thumbnail editor will load correctly.
 
 //Add functionality to reorder layers on thumbnail.
-//Add functionality to remove layers.
+//Need to implement way to detect when the video frame has actually updated to the correct image on page load, before drawing thumbnail.
 
 (function($) {
 	// plugin definition
@@ -13,8 +13,8 @@
 		var defaults = {
 			framerate:30,
 			tnWidth:640,
-			tnHeight:264,
-			tnAspectRatio:640/264
+			tnHeight:360,
+			tnAspectRatio:640/360
 		}
 		var options =  $.extend(defaults, options);
 		
@@ -39,13 +39,15 @@
 										'<div>' +
 											'<canvas style="float:left;" id="ThumbnailPreview" width="'+options.tnWidth+'" height="'+options.tnHeight+'"></canvas>' +
 											'<ul style="float:left;" id="ElementList"></ul>' +
-											'<select id="ElementOptions"></select><input type="button" id="ElementAdd" value="Add" />' +
+											'<select id="ElementOptions"></select>' +
+											'<input type="button" id="ElementAdd" value="Add" />' +
+											'<input type="button" id="ElementRemove" value="Remove" />' +
 										'</div>' +
 										'<div style="clear:both;">' +
-											'<input type="button" id="tnElLeftBtn" class="tnEditBtn" tnVal=\'{"xPos":"-1"}\' value="Left" />' +
-											'<input type="button" id="tnElRightBtn" class="tnEditBtn" tnVal=\'{"xPos":"1"}\' value="Right" />' +
-											'<input type="button" id="tnElUpBtn" class="tnEditBtn" tnVal=\'{"yPos":"-1"}\' value="Up" />' +
-											'<input type="button" id="tnElDownBtn" class="tnEditBtn" tnVal=\'{"yPos":"1"}\' value="Down" />' +
+											'<input type="button" id="tnElLeftBtn" class="tnEditBtn" tnVal=\'{"xPos":"-10"}\' value="Left" />' +
+											'<input type="button" id="tnElRightBtn" class="tnEditBtn" tnVal=\'{"xPos":"10"}\' value="Right" />' +
+											'<input type="button" id="tnElUpBtn" class="tnEditBtn" tnVal=\'{"yPos":"-10"}\' value="Up" />' +
+											'<input type="button" id="tnElDownBtn" class="tnEditBtn" tnVal=\'{"yPos":"10"}\' value="Down" />' +
 											'<input type="button" id="tnElPlusBtn" class="tnEditBtn" tnVal=\'{"width":"1","height":"1"}\' value="+" />' +
 											'<input type="button" id="tnElMinusBtn" class="tnEditBtn" tnVal=\'{"width":"-1","height":"-1"}\' value="-" />' +
 										'</div>' +
@@ -70,6 +72,7 @@
 			var $wub_thumb_ElementList	= $('#ElementList', $video_container.parent());
 			var $wub_thumb_ElementOpt	= $('#ElementOptions', $video_container.parent());
 			var $wub_thumb_ElementAdd	= $('#ElementAdd', $video_container.parent());
+			var $wub_thumb_ElementRem	= $('#ElementRemove', $video_container.parent());
 			var $tnElLeftBtn			= $('#tnElLeftBtn', $video_container.parent());
 			var $tnElRightBtn			= $('#tnElRightBtn', $video_container.parent());
 			var $tnElUpBtn				= $('#tnElUpBtn', $video_container.parent());
@@ -91,7 +94,7 @@
 					setTimeout(function() {
 						tnProperties = loadThumbnail(); 
 						drawThumbnail();
-					}, 500);
+					}, 3000);
 					loadElementList();
 				} else {
 					setTimeout(setDefaults, 150);
@@ -142,7 +145,7 @@
 					heldinterval = setInterval(function() { 
 						Object.keys(editProps).forEach(function(key) {
 							tnProperties[$activeEl.attr('index')][key] += parseFloat(editProps[key]);
-						})
+						});
 						drawThumbnail(); 
 					}, 100);
 				}
@@ -163,7 +166,6 @@
 				
 				//Draw the video contents into the canvas x, y, width, height
 				tnProperties.forEach(function(element) {
-					//alert(element.img.currentTime);
 					context.drawImage(element.img,element.xPos,element.yPos,element.width,element.height);
 				});
 			}
@@ -171,7 +173,7 @@
 			function saveThumbnail() {
 				var saveProperties = tnProperties.slice();
 				saveProperties.forEach(function(element, index) {
-					element.img = (element.img.id == "wubPlayer") ? "Video" : element.img;
+					element.img = (element.img.id == "wubPlayer") ? "Video" : element.img.src.substring(element.img.src.lastIndexOf('/')+1);
 				});
 				window.opener.thumbnailInfo = { thumbnailTime:$wub_thumb_Time.val(), thumbnailProps:saveProperties.slice()};
 			}
@@ -179,9 +181,9 @@
 			function loadThumbnail() {
 				//Use stored thumbnail settings, or the defaults.
 				if (typeof window.opener.thumbnailInfo.thumbnailProps !== 'undefined') { 
-					var tnPropertiesSaved = window.opener.thumbnailInfo.thumbnailProps.slice();
+					var tnPropertiesSaved = JSON.parse(JSON.stringify(window.opener.thumbnailInfo.thumbnailProps.slice()));
 					tnPropertiesSaved.forEach(function(element, index) {
-						element.img = (element.img == "Video" || element.img.id == "wubPlayer") ? video : element.img;
+						element.img = (element.img == "Video") ? video : $('<img src="/thumbnailResources/'+element.img+'"></img>')[0];
 					});
 				}
 				return (tnPropertiesSaved) ? tnPropertiesSaved.slice() : tnPropertiesDefault.slice();
@@ -204,8 +206,12 @@
 				
 				
 				//Populate options list.
-				//Make options load from a json file.
-				$wub_thumb_ElementOpt.append('<option value="MattFrump.png" elWidth="17" elHeight="25">Matt Frump</option>')
+				$.getJSON("thumbnailResources/thumbnailresources.json", function(data) {
+					data.forEach(function(element) {
+						$wub_thumb_ElementOpt.append('<option value="'+element.src+'" elWidth="'+element.width+'" elHeight="'+element.height+'">'+element.title+'</option>');
+						$wub_thumb_ElementOpt.after('<img src="/thumbnailResources/'+element.src+'" style="display:none;"></img>'); //Image has to be loaded on to page first for it to be drawn properly the first time. Otherwise only later drawThumbnail() calls will actually render it.
+					});
+				});
 				
 				//Add option to thumbnail/element list.
 				$wub_thumb_ElementAdd.click(function() {
@@ -216,7 +222,20 @@
 					$wub_thumb_ElementList.find(':last').click(selectElement);
 					//Add to frame.
 					tnProperties.push({img:$('<img src="/thumbnailResources/'+$optAdd.val()+'"></img>')[0],xPos:0,yPos:0,width:17,height:25});
-					drawThumbnail();
+					setInterval(drawThumbnail(),150);
+				});
+				
+				//Remove selected element.
+				$wub_thumb_ElementRem.click(function() {
+					if($wub_thumb_ElementList.children('li.active').length === 1) {
+						var $activeEl = $wub_thumb_ElementList.children('li.active');
+						tnProperties.splice($activeEl.attr('index'),1);
+						$activeEl.remove();
+						$wub_thumb_ElementList.children().each(function (index, element) {
+							$(element).attr('index',index);
+						});
+						drawThumbnail();
+					}
 				});
 				
 				//Add elements from saved thumbnails.
