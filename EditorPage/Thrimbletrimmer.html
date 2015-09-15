@@ -9,12 +9,45 @@
 	<script src="scripts/jquery-ui-1.11.4/jquery-ui.js"></script>
 	<script src="scripts/wubPlayerControls.js"></script>
 	<script src="scripts/wubEditorControls.js"></script>
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
 	<link rel="stylesheet" href="scripts/jquery-ui-1.11.4/jquery-ui.css">
 	<link rel="stylesheet" href="styles/wubPlayerControls.css">
 	<link rel="stylesheet" href="styles/wubEditorControls.css">
+	<meta name="google-signin-client_id" content="345276493482-r84m2giavk10glnmqna0lbq8e1hdaus0.apps.googleusercontent.com">
 </head>
 <body>
-	<div id="EditorContent">	
+	<div id="Sign-in">
+		<div class="g-signin2" data-onsuccess="onSignIn"></div>
+		<span id="g-signin-response"></span>
+		<script type="text/javascript">
+			function onSignIn(googleUser) {
+				var id_token = googleUser.getAuthResponse().id_token;
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', '/tokensignin');
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				xhr.onload = function() {
+					console.log(xhr.responseText);
+					$('#g-signin-response').text(xhr.responseText);
+					if(xhr.responseText.indexOf("User Authenticated") === 0) {
+						$('#Sign-in').hide();
+						$('#EditorContent').show();
+					}
+				};
+				xhr.send('id_token=' + id_token);
+			}
+		</script>
+	</div>
+	<div id="EditorContent" style="display:none">	
+		<a href="#" onclick="signOut();" style="float:right;">Sign out</a>
+		<script>
+		  function signOut() {
+			var auth2 = gapi.auth2.getAuthInstance();
+			auth2.signOut().then(function () {
+			  console.log('User signed out.');
+			  window.location.reload();
+			});
+		  }
+		</script>
 	</div>
 	<script type="text/javascript">
 		var path = window.location.protocol + '//' + window.location.hostname;
