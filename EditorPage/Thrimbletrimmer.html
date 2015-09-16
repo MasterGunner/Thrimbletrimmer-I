@@ -19,6 +19,7 @@
 	<div id="Sign-in">
 		<div class="g-signin2" data-onsuccess="onSignIn"></div>
 		<span id="g-signin-response"></span>
+		<span id="g-signin-sessionId" style="display:none;"></span>
 		<script type="text/javascript">
 			function onSignIn(googleUser) {
 				var id_token = googleUser.getAuthResponse().id_token;
@@ -27,10 +28,11 @@
 				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 				xhr.onload = function() {
 					console.log(xhr.responseText);
-					$('#g-signin-response').text(xhr.responseText);
-					if(xhr.responseText.indexOf("User Authenticated") === 0) {
-						$('#Sign-in').hide();
-						$('#EditorContent').show();
+					var resData = JSON.parse(xhr.responseText);
+					$('#g-signin-response').text(resData.Response);
+					if(resData.Response == "User Authenticated" && resData.SessionId) {
+						$('#g-signin-sessionId').text(resData.SessionId);
+						PageSetup();
 					}
 				};
 				xhr.send('id_token=' + id_token);
@@ -53,15 +55,19 @@
 		var path = window.location.protocol + '//' + window.location.hostname;
 		var thumbnailInfo = {};
 		
+		var getAuthToken = function() {
+			gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+		}
+		
 		var getExtraData = function() {
-			var extraData = [thumbnailInfo];
+			var extraData = [{SessionId:$('#g-signin-sessionId').text()}, thumbnailInfo];
 			return extraData;
 		}
 		
 		var CallForWubs = function(Callback) {
 			if(window.location.search.match(/video=(.*?)(&|$)/i)) {
 				var videoID = window.location.search.match(/video=(.*?)(&|$)/i)[1];
-				$.get('/getwubs/'+videoID,function(data) { Callback(data); },'json');
+				$.get('/getwubs/'+videoID+'?SessionId='+$('#g-signin-sessionId').text(),function(data) { Callback(data); },'json');
 			}
 		};
 		
@@ -87,9 +93,9 @@
 		
 		var PageSetup = function() {
 			CallForWubs(InsertVideo);
+			$('#Sign-in').hide();
+			$('#EditorContent').show();
 		};
-		
-		PageSetup();
 	</script>
 </body>
 </html>

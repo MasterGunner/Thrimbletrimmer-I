@@ -157,7 +157,7 @@
 									alert('Successfully submitted video.\r\n' + data);
 								});
 								posting.fail(function(data) {
-									alert('Failed to submit video.\r\n' + data);
+									alert('Failed to submit video.\r\n' + data.status+' - '+data.responseText);
 								});
 								//posting.always(function(data) {
 								//	alert('Finished!\r\n' + data);
