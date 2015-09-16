@@ -55,10 +55,6 @@
 		var path = window.location.protocol + '//' + window.location.hostname;
 		var thumbnailInfo = {};
 		
-		var getAuthToken = function() {
-			gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
-		}
-		
 		var getExtraData = function() {
 			var extraData = [{SessionId:$('#g-signin-sessionId').text()}, thumbnailInfo];
 			return extraData;
