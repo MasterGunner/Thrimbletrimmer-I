@@ -15,6 +15,7 @@ app.use(express.static('../Videos')); //Serves the video chunks to edit.
 // UTILITY FUNCTIONS
 //
 
+<<<<<<< HEAD
 //General Authentication
 var vstAuth = function(id_token, callback) {
 	//Set up callback function.
@@ -25,15 +26,55 @@ var vstAuth = function(id_token, callback) {
 			callback(false, null);
 		} else {
 			var userInfo = body.getPayload();
+=======
+//Authentication
+app.post('/tokensignin', function (req, res) {
+	console.log(req.body);
+
+	//Set up callback function.
+	callback = function(authRes) {
+		var body = '' //Response Output buffer;
+		//Append chunks from response to output buffer.
+		authRes.on('data', function (chunk) {
+			body += chunk;
+		});
+		//When response is completed, output entire response.
+		authRes.on('end', function () {
+			console.log(body);
+			
+			//Confirm signed-in user is in list of valid users.
+			var userInfo = JSON.parse(body);
+>>>>>>> b4c29a97312a146871e00c3458ba51d756e81a52
 			var userEmail = userInfo.email;
 			var AuthUserList = fs.readFileSync('./AuthenticatedUserList.txt').toString().split("\n");
 			if (AuthUserList.indexOf(userEmail) >= 0) {
 				console.log('User Authenticated: '+userEmail);
+<<<<<<< HEAD
 				callback(true, generateSessionId(userInfo));
 			} else {
 				console.log('User Not Authenticated: '+userEmail);
 				callback(false, null);
 			}
+=======
+				res.send('User Authenticated: '+userEmail);
+			} else {
+				console.log('User Not Authenticated: '+userEmail);
+				res.send('User Not Authenticated: '+userEmail);
+			}
+		});
+	}
+
+	//Make the request.
+	var authReq = https.get('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token='+req.body.id_token, callback).end();
+});
+
+//Returns the video data.
+app.get('/getwubs/:a?', function (req, res) {
+	fs.readFile('../Videos/videolist.json', 'utf8', function (err, data) {
+		if (err) {
+			res.sendStatus(500);
+			return console.log(err);
+>>>>>>> b4c29a97312a146871e00c3458ba51d756e81a52
 		}
 	}
 
