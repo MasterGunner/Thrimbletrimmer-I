@@ -15,7 +15,6 @@ app.use(express.static('../Videos')); //Serves the video chunks to edit.
 // UTILITY FUNCTIONS
 //
 
-<<<<<<< HEAD
 //General Authentication
 var vstAuth = function(id_token, callback) {
 	//Set up callback function.
@@ -26,7 +25,7 @@ var vstAuth = function(id_token, callback) {
 			callback(false, null);
 		} else {
 			var userInfo = body.getPayload();
-=======
+
 //Authentication
 app.post('/tokensignin', function (req, res) {
 	console.log(req.body);
@@ -44,18 +43,15 @@ app.post('/tokensignin', function (req, res) {
 			
 			//Confirm signed-in user is in list of valid users.
 			var userInfo = JSON.parse(body);
->>>>>>> b4c29a97312a146871e00c3458ba51d756e81a52
 			var userEmail = userInfo.email;
 			var AuthUserList = fs.readFileSync('./AuthenticatedUserList.txt').toString().split("\n");
 			if (AuthUserList.indexOf(userEmail) >= 0) {
 				console.log('User Authenticated: '+userEmail);
-<<<<<<< HEAD
 				callback(true, generateSessionId(userInfo));
 			} else {
 				console.log('User Not Authenticated: '+userEmail);
 				callback(false, null);
 			}
-=======
 				res.send('User Authenticated: '+userEmail);
 			} else {
 				console.log('User Not Authenticated: '+userEmail);
@@ -74,7 +70,6 @@ app.get('/getwubs/:a?', function (req, res) {
 		if (err) {
 			res.sendStatus(500);
 			return console.log(err);
->>>>>>> b4c29a97312a146871e00c3458ba51d756e81a52
 		}
 	}
 
