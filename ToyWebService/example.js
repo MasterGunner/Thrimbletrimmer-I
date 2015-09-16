@@ -1,8 +1,12 @@
-var express = require('express');
-var bodyParser = require('body-parser');
+//standard libraries.
 var https = require('https');
 var fs = require('fs');
+
+//npm install express, body-parser, and google-auth-library.
+var express = require('express');
+var bodyParser = require('body-parser');
 var GoogleAuth = require('google-auth-library');
+
 
 var app = express();
 app.use(bodyParser.json());
