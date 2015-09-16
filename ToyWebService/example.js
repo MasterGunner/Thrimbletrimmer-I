@@ -16,46 +16,11 @@ app.use(express.static('../EditorPage')); //Serves the Editor page and other sta
 app.use(express.static('../Videos')); //Serves the video chunks to edit.
 
 //
-// UTILITY FUNCTIONS
+// WUBLOADER FUNCTIONS
 //
 
-//General Authentication
-var vstAuth = function(id_token, callback) {
-	//Set up callback function.
-	authValidation = function(err, body) {
-		if(err) {
-			console.log("Error Authenticating OAuth Token:");
-			console.log(err);
-			callback(false, null);
-		} else {
-			var userInfo = body.getPayload();
-			var userEmail = userInfo.email;
-			var AuthUserList = fs.readFileSync('./AuthenticatedUserList.txt').toString().split("\n");
-			if (AuthUserList.indexOf(userEmail) >= 0) {
-				console.log('User Authenticated: '+userEmail);
-				callback(true, generateSessionId(userInfo));
-			} else {
-				console.log('User Not Authenticated: '+userEmail);
-				callback(false, null);
-			}
-		}
-	}
-
-	//Validate user token with Google.
-	console.log(id_token); //For some reason, if this is commented out, the verifyIdToken function fails.
-	(new (new GoogleAuth).OAuth2).verifyIdToken(id_token,null,authValidation);
-	//(new (new GoogleAuth).OAuth2).verifyIdToken(token,null,function(a,b) { if(a) { console.log(a); } else {console.log(b.getPayload()); x=b.getPayload(); } });
-}
-
-var generateSessionId = function(userInfo) {
-	return 1234567890;
-}
-
-var validateSessionId = function(sessionId) {
-	return (sessionId == 1234567890) ? true:false;
-}
-
 var getVideo = function(videoId) {
+	//Test function only. Replace with calls to the Wubloader for video information.
 	var response = false;
 	try {
 		var jsonData = JSON.parse(fs.readFileSync('../Videos/videolist.json', 'utf8'));
@@ -85,10 +50,50 @@ var submitVideo = function(data) {
 }
 
 //
+// UTILITY FUNCTIONS
+//
+
+//General Authentication
+var vstAuth = function(id_token, callback) {
+	//Set up callback function.
+	authValidation = function(err, body) {
+		if(err) {
+			console.log("Error Authenticating OAuth Token:");
+			console.log(err);
+			callback(false, null);
+		} else {
+			var userInfo = body.getPayload();
+			var userEmail = userInfo.email;
+			var AuthUserList = fs.readFileSync('./AuthenticatedUserList.txt').toString().split("\n");
+			if (AuthUserList.indexOf(userEmail) >= 0) {
+				console.log('User Authenticated: '+userEmail);
+				callback(true, generateSessionId(userInfo));
+			} else {
+				console.log('User Not Authenticated: '+userEmail);
+				callback(false, null);
+			}
+		}
+	}
+
+	//Validate user token with Google.
+	id_token; //For some reason, if this is commented out, the verifyIdToken function fails.
+	(new (new GoogleAuth).OAuth2).verifyIdToken(id_token,null,authValidation);
+	//(new (new GoogleAuth).OAuth2).verifyIdToken(token,null,function(a,b) { if(a) { console.log(a); } else {console.log(b.getPayload()); x=b.getPayload(); } });
+}
+
+var generateSessionId = function(userInfo) {
+	return 1234567890;
+}
+
+var validateSessionId = function(sessionId) {
+	return (sessionId == 1234567890) ? true:false;
+}
+
+//
 // HTTP RESPONSE FUNCTIONS
 //
 
-//Set Default Page.
+//Set Default Page. Only for testing purposes.
 app.get('/', function (req, res) {
     res.sendFile('default.html', { root: __dirname } );
 });
