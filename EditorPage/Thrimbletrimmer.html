@@ -53,10 +53,11 @@
 	</div>
 	<script type="text/javascript">
 		var path = window.location.protocol + '//' + window.location.hostname;
-		var thumbnailInfo = {};
+		var _startOffset = 10;
+		var _endOffset = 10;
 		
 		var getExtraData = function() {
-			var extraData = [{SessionId:$('#g-signin-sessionId').text()}, thumbnailInfo];
+			var extraData = [{SessionId:$('#g-signin-sessionId').text()}];
 			return extraData;
 		}
 		
@@ -72,20 +73,11 @@
 											'<source src="'+wubs.src+'" type="'+wubs.type+'" />' +
 											'Your browser does not support HTML5 video.' +
 										'</video>');
-			$('#wubPlayer').wVideo({startOffset:10});
-			$('#wubPlayer').wEditor({submitLoc:'/setwubs', startOffset:10, endOffset:10, vidID:wubs.vidID, title:wubs.title, description:wubs.description, extraMetadata:getExtraData});
-			//Add Thumbnail selection/editing functionality.
-			$('#SubmitButton').before('<input type="button" id="SetThumbnail" value="Set Thumbnail"/>');
-			$('#SetThumbnail').click(function() {
-				var thumbnailEditor = window.open('ThumbnailEditor.html','Thumbnail Editor','width=800, height=600, scrollbars=yes');
-				thumbnailEditor.video_source = wubs.src;
-				thumbnailEditor.video_type = wubs.type;
-				thumbnailEditor.video_width = wubs.width;
-				thumbnailEditor.video_height = wubs.height;
-				thumbnailEditor.video_framerate = wubs.framerate;
-			});
+			$('#wubPlayer').wVideo({startOffset:_startOffset}); //Set start time for playing the video.
+			//Call the video editor controls plugin.
+			$('#wubPlayer').wEditor({submitLoc:'/setwubs', startOffset:_startOffset, endOffset:_endOffset, vidID:wubs.vidID, title:wubs.title, description:wubs.description, extraMetadata:getExtraData});
+			
 		};
-		
 		
 		var PageSetup = function() {
 			CallForWubs(InsertVideo);

@@ -39,7 +39,7 @@
 										'</div>' +
 									'</div>');
 			var $editor_fields = $('<div id="EditorDetailsPane" style="clear:both; padding-top:5px;">' +
-										'<div>Title:<br /><input type="text" id="VideoTitle" value="'+options.title+'" /></div>' +
+										'<div>Title:<br /><input type="text" id="VideoTitle" value="'+options.title+'" maxlength="91" /></div>' +
 										'<div>Description:<br/><textarea id="VideoDescription" >'+options.description+'</textarea></div>' +
 										'<input type="button" id="SubmitButton" value="Submit" />' +
 									'</div>');
@@ -129,7 +129,7 @@
 						video.currentTime = endSeconds;
 					});
 					
-					//Prevent video fro progressing beyond end timestamp (if requested)
+					//Prevent video from progressing beyond end timestamp (if requested)
 					$(video).on('timeupdate', function() {
 						if ($wub_editor_limitPlayback.prop('checked') && video.currentTime >= endSeconds) { 
 							video.pause();
@@ -150,26 +150,13 @@
 								description:$wub_editor_Description.val(),
 								extraMetadata:options.extraMetadata()
 							};
-							if(options.submitLoc) {
-								var posting = $.post(options.submitLoc, data);
-								//var posting = $.post(options.submitLoc, JSON.stringify(data));
-								posting.done(function(data) {
-									alert('Successfully submitted video.\r\n' + data);
-								});
-								posting.fail(function(data) {
-									alert('Failed to submit video.\r\n' + data.status+' - '+data.responseText);
-								});
-								//posting.always(function(data) {
-								//	alert('Finished!\r\n' + data);
-								//});
-							} else {
-								alert("Video ID: " + options.vidID
-								+ "\r\nStart: " + startSeconds 
-								+ "\r\nEnd: " + endSeconds
-								+ "\r\nTitle: " + $wub_editor_Title.val() 
-								+ "\r\nDescription: " + $wub_editor_Description.val()
-								+ "\r\nExtraMetadata: " + options.extraMetadata());
-							}
+							var posting = $.post(options.submitLoc, data);
+							posting.done(function(data) {
+								alert('Successfully submitted video.\r\n' + data);
+							});
+							posting.fail(function(data) {
+								alert('Failed to submit video.\r\n' + data.status+' - '+data.responseText);
+							});
 						}
 					});
 				} else {

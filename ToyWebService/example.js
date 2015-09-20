@@ -15,14 +15,18 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static('../EditorPage')); //Serves the Editor page and other static content.
 app.use(express.static('../Videos')); //Serves the video chunks to edit.
 
+//Namespace for new functions.
+var vst = vst || {};
+
 //
 // WUBLOADER FUNCTIONS
 //
 
-var getVideo = function(videoId) {
+vst.getVideo = function(videoId) {
 	//Test function only. Replace with calls to the Wubloader for video information.
 	var response = false;
 	try {
+		///////////////////////////////////////////////////////////////////////////////////////////
 		var jsonData = JSON.parse(fs.readFileSync('../Videos/videolist.json', 'utf8'));
 		for (var i = 0; i < jsonData.length; i++) {
 			if(jsonData[i].vidID == videoId) {
@@ -39,53 +43,84 @@ var getVideo = function(videoId) {
 				break;
 			}
 		}
+		///////////////////////////////////////////////////////////////////////////////////////////
 	} catch (err) {
-		console.log(err);
+		vst.log(err);
 	}
 	return response;
 }
 
-var submitVideo = function(data) {
-	//Do something.
+vst.submitVideo = function(data) {
+	var successfulSubmission = false;
+	if(vst.validateVideoSubmission(data)) {
+		try {
+			//Do something.
+			///////////////////////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////////////////////////////////////////////////
+			successfulSubmission = true;
+		} catch (err) {
+			vst.log(err);
+		}
+	}
+	return successfulSubmission
 }
 
 //
 // UTILITY FUNCTIONS
 //
 
+//Logging
+vst.log = function(message) {
+	console.log(message);
+}
+
+//Video Input Validation
+vst.validateVideoSubmission = function (data) {
+	var validation = false;
+	if(data.vidID && data.start && data.end && data.title && data.description) {
+		if(data.start < data.end && data.title.length <= 91 ) {
+			validation = true;
+		}
+	}
+	return validation;
+}
+
 //General Authentication
-var vstAuth = function(id_token, callback) {
+vst.auth = function(id_token, callback) {
 	//Set up callback function.
-	authValidation = function(err, body) {
+	var authValidation = function(err, body) {
 		if(err) {
-			console.log("Error Authenticating OAuth Token:");
-			console.log(err);
+			vst.log("Error Authenticating OAuth Token:");
+			vst.log(err);
 			callback(false, null);
 		} else {
 			var userInfo = body.getPayload();
 			var userEmail = userInfo.email;
-			var AuthUserList = fs.readFileSync('./AuthenticatedUserList.txt').toString().split("\n");
-			if (AuthUserList.indexOf(userEmail) >= 0) {
-				console.log('User Authenticated: '+userEmail);
-				callback(true, generateSessionId(userInfo));
+			var authUserList = fs.readFileSync('./AuthenticatedUserList.txt').toString().split("\n");
+			if (authUserList.indexOf(userEmail) >= 0) {
+				vst.log('User Authenticated: '+userEmail);
+				callback(true, vst.generateSessionId(userInfo));
 			} else {
-				console.log('User Not Authenticated: '+userEmail);
+				vst.log('User Not Authenticated: '+userEmail);
 				callback(false, null);
 			}
 		}
 	}
 
 	//Validate user token with Google.
-	id_token; //For some reason, if this is commented out, the verifyIdToken function fails.
-	(new (new GoogleAuth).OAuth2).verifyIdToken(id_token,null,authValidation);
-	//(new (new GoogleAuth).OAuth2).verifyIdToken(token,null,function(a,b) { if(a) { console.log(a); } else {console.log(b.getPayload()); x=b.getPayload(); } });
+	//id_token; //For some reason, if this is commented out, the verifyIdToken function fails. //Ok, wrapping the verify function in a try/catch fixes it.
+	try {
+		(new (new GoogleAuth).OAuth2).verifyIdToken(id_token,null,authValidation);
+	} catch (err) {
+		vst.log(err);
+	}
 }
 
-var generateSessionId = function(userInfo) {
+//Replace these with better session handling using the express-session library?
+vst.generateSessionId = function(userInfo) {
 	return 1234567890;
 }
-
-var validateSessionId = function(sessionId) {
+vst.validateSessionId = function(sessionId) {
 	return (sessionId == 1234567890) ? true:false;
 }
 
@@ -100,8 +135,8 @@ app.get('/', function (req, res) {
 
 //Initial Authentication
 app.post('/tokensignin', function (req, res) {
-	//console.log(req.body);
-	vstAuth(req.body.id_token, function(isAuth, sessionId) {
+	//vst.log(req.body);
+	vst.auth(req.body.id_token, function(isAuth, sessionId) {
 		if(isAuth) {
 			var data = {Response:'User Authenticated', SessionId:sessionId}
 			res.json(data);
@@ -114,12 +149,12 @@ app.post('/tokensignin', function (req, res) {
 
 //Returns the video data.
 app.get('/getwubs/:a?', function (req, res) {
-	if(validateSessionId(req.query.SessionId)) {
-		var videoData  = getVideo(req.params.a);		
+	if(vst.validateSessionId(req.query.SessionId)) {
+		var videoData  = vst.getVideo(req.params.a);		
 		if(videoData) {
 			res.json(videoData);
 		} else {
-			res.sendStatus(500);
+			res.sendStatus(400);
 		}
 	} else {
 		res.sendStatus(401);
@@ -128,15 +163,18 @@ app.get('/getwubs/:a?', function (req, res) {
 
 //Accept POST request
 app.post('/setwubs', function (req, res) {
-	console.log(req.body);
-	if(validateSessionId(req.body["extraMetadata[0][SessionId]"])) {
-		submitVideo(req.body);
-		res.send('Recieved Video Edits');
+	vst.log(req.body);
+	if(vst.validateSessionId(req.body["extraMetadata[0][SessionId]"])) {
+		if (vst.submitVideo(req.body)) {
+			res.send('Recieved Video Edits');
+		} else {
+			res.sendStatus(500);
+		}
 	} else {
 		res.sendStatus(401);
 	}
 });
 
 app.listen(1337)
-console.log('Server running at http://127.0.0.1:1337/');
-//console.log('Access the Editor at http://127.0.0.1:1337/Thrimbletrimmer.html?Video=1234');
+vst.log('Server running at http://127.0.0.1:1337/');
+//vst.log('Access the Editor at http://127.0.0.1:1337/Thrimbletrimmer.html?Video=1234');
