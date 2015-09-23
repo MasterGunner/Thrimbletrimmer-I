@@ -1,0 +1,3 @@
+module Xannathor {
+	exports = Xannathor;
+}
