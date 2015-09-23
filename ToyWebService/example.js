@@ -37,7 +37,9 @@ vst.getVideo = function(videoId) {
 					type:video.type,
 					title:video.title,
 					description:video.description,
-					framerate:video.framerate
+					framerate:video.framerate,
+					width:video.width,
+					height:video.height
 				};
 				response = data;
 				break;
