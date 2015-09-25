@@ -3,9 +3,9 @@
 var fs = require('fs');
 module Xannathor {
 	export module WubloaderIntegration {
-		export function getVideo(videoId: string) {
+		export function getVideo(videoId: string): Object {
 			//Test function only. Replace with calls to the Wubloader for video information.
-			var response = false;
+			var response = null;
 			try {
 				///////////////////////////////////////////////////////////////////////////////////////////
 				var jsonData = JSON.parse(fs.readFileSync('../Videos/videolist.json', 'utf8'));
@@ -33,7 +33,7 @@ module Xannathor {
 			return response;
 		}
 		
-		export function submitVideo(data) {
+		export function submitVideo(data): boolean {
 			var successfulSubmission = false;
 			if(Utilities.validateVideoSubmission(data)) {
 				try {

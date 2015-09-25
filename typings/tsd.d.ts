@@ -4,4 +4,3 @@
 /// <reference path="serve-static/serve-static.d.ts" />
 /// <reference path="mime/mime.d.ts" />
 /// <reference path="google-auth-library/google-auth-library.d.ts" />
-/// <reference path="Xannathor/Xannathor.d.ts" />

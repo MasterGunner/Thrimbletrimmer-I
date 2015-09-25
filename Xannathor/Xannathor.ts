@@ -27,7 +27,7 @@ app.use(express.static('../Videos')); //Serves the video chunks to edit.
 
 //Set Default Page. Only for testing purposes.
 app.get('/', function (req, res) {
-    res.sendFile('default.html', { root: __dirname } );
+    res.sendFile('../Resources/default.html', { root: __dirname } );
 });
 
 //Initial Authentication
