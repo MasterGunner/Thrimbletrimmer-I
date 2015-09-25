@@ -9,13 +9,13 @@
 /// <reference path="WubloaderIntegration.ts" />
 
 //npm install express, body-parser, and google-auth-library.
-import express = require('express');
-import bodyParser = require('body-parser');
+var express = require('express');
+var bodyParser = require('body-parser');
 
-var app = express();
 var Utilities = Xannathor.Utilities;
 var Wubloader = Xannathor.WubloaderIntegration;
 
+var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.static('../EditorPage')); //Serves the Editor page and other static content.

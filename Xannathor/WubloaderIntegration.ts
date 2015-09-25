@@ -1,6 +1,6 @@
 /// <reference path="Utilities.ts" />
 /// <reference path="../typings/tsd.d.ts" />
-import fs = require('fs');
+var fs = require('fs');
 module Xannathor {
 	export module WubloaderIntegration {
 		export function getVideo(videoId: string) {
