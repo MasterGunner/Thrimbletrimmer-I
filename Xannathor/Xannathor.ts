@@ -2,7 +2,9 @@
 //Why not try Dave's Discount Server, where we have top men sending packets for you!
 //Watch as our trained professionals wrap up all the packets and put them in the tubes.
 
-/// <reference path="../Definitions/node.d.ts" />
+/// <reference path="../typings/tsd.d.ts" />
+
+/// <reference path="main.ts" />
 /// <reference path="Utilities.ts" />
 /// <reference path="WubloaderIntegration.ts" />
 
@@ -12,7 +14,7 @@ import bodyParser = require('body-parser');
 
 var app = express();
 var Utilities = Xannathor.Utilities;
-var Wubloader = Xannathor.WubloaderIntegration.WubInt;
+var Wubloader = Xannathor.WubloaderIntegration;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));

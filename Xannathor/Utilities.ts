@@ -1,5 +1,8 @@
+/// <reference path="../typings/tsd.d.ts" />
+import fs = require('fs');
+import GoogleAuth = require('google-auth-library');
+
 module Xannathor {
-	import fs = require('fs');
 	export module Utilities {
 		//Logging
 		export function log (message: string) {
@@ -7,7 +10,7 @@ module Xannathor {
 		}
 		
 		//Video Input Validation
-		export function validateVideoSubmission (data) { 
+		export function validateVideoSubmission (data: any) { 
 			var validation = false;
 			if(data.vidID && data.start && data.end && data.title && data.description) {
 				if(data.start < data.end && data.title.length <= 91 ) {
@@ -18,7 +21,7 @@ module Xannathor {
 		}
 		
 		//General Authentication
-		export function auth (id_token: string, callback) {
+		export function auth (id_token: string, callback: Function) {
 			//Set up callback function.
 			var authValidation = function(err, body) {
 				if(err) {
@@ -49,8 +52,8 @@ module Xannathor {
 		}
 		
 		//Replace these with better session handling using the express-session library?
-		export function generateSessionId (userInfo) {
-			return 1234567890;
+		export function generateSessionId (userInfo: any) {
+			return '1234567890';
 		}
 		export function validateSessionId (sessionId: string) {
 			return (sessionId == '1234567890') ? true:false;

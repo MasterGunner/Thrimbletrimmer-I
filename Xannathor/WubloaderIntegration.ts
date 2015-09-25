@@ -1,41 +1,39 @@
 /// <reference path="Utilities.ts" />
-
+/// <reference path="../typings/tsd.d.ts" />
+import fs = require('fs');
 module Xannathor {
-	import GoogleAuth = require('google-auth-library');
-	import fs = require('fs');
 	export module WubloaderIntegration {
-		export class WubInt {
-			static getVideo(videoId: string) {
-				//Test function only. Replace with calls to the Wubloader for video information.
-				var response = false;
-				try {
-					///////////////////////////////////////////////////////////////////////////////////////////
-					var jsonData = JSON.parse(fs.readFileSync('../Videos/videolist.json', 'utf8'));
-					for (var i = 0; i < jsonData.length; i++) {
-						if(jsonData[i].vidID == videoId) {
-							var video = jsonData[i];
-							var data = { 
-								vidID:video.vidID,
-								src:video.src,
-								type:video.type,
-								title:video.title,
-								description:video.description,
-								framerate:video.framerate,
-								width:video.width,
-								height:video.height
-							};
-							response = data;
-							break;
-						}
+		export function getVideo(videoId: string) {
+			//Test function only. Replace with calls to the Wubloader for video information.
+			var response = false;
+			try {
+				///////////////////////////////////////////////////////////////////////////////////////////
+				var jsonData = JSON.parse(fs.readFileSync('../Videos/videolist.json', 'utf8'));
+				for (var i = 0; i < jsonData.length; i++) {
+					if(jsonData[i].vidID == videoId) {
+						var video = jsonData[i];
+						var data = { 
+							vidID:video.vidID,
+							src:video.src,
+							type:video.type,
+							title:video.title,
+							description:video.description,
+							framerate:video.framerate,
+							width:video.width,
+							height:video.height
+						};
+						response = data;
+						break;
 					}
-					///////////////////////////////////////////////////////////////////////////////////////////
-				} catch (err) {
-					Utilities.log(err);
 				}
-				return response;
+				///////////////////////////////////////////////////////////////////////////////////////////
+			} catch (err) {
+				Utilities.log(err);
+			}
+			return response;
 		}
 		
-		static submitVideo(data) {
+		export function submitVideo(data) {
 			var successfulSubmission = false;
 			if(Utilities.validateVideoSubmission(data)) {
 				try {
@@ -48,7 +46,6 @@ module Xannathor {
 				}
 			}
 			return successfulSubmission
-		}
 		}
 	}
 }
