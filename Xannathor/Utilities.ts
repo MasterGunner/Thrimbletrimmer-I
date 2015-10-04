@@ -5,9 +5,13 @@ var GoogleAuth = require('google-auth-library');
 module Xannathor {
 	export module Utilities {
 		//Logging
-		export function log (message: string): void {
+		export function log (message:string): void {
 			console.log(message);
 		}
+		
+		/*export function log (...message: any[]): void {
+			console.log(message.join(" "));
+		}*/
 		
 		//Video Input Validation
 		export function validateVideoSubmission (data: any): boolean { 

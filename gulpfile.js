@@ -15,6 +15,11 @@ gulp.task('build-Xannathor', function () {
     return merge(output);
 });
 
+gulp.task('build-tests', function () {
+    var proj = ts.createProject('tests/tsconfig.json');
+    return proj.src().pipe(ts(proj)).js.pipe(gulp.dest('.'));
+});
+
 
 var del = require('del');
 var vinylPaths = require('vinyl-paths');
@@ -35,5 +40,5 @@ gulp.task('minify', function () {
 
 var runSequence = require('run-sequence');
 gulp.task('build', function () {
-    runSequence('build-Xannathor', 'build-clean', 'minify');
+    runSequence('build-Xannathor', 'build-tests', 'build-clean', 'minify');
 });

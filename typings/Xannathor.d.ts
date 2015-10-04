@@ -1,6 +1,4 @@
 /// <reference path="../typings/tsd.d.ts" />
-declare module Xannathor {
-}
 declare var fs: any;
 declare var GoogleAuth: any;
 declare module Xannathor {
@@ -15,12 +13,22 @@ declare module Xannathor {
 declare var fs: any;
 declare module Xannathor {
     module WubloaderIntegration {
+        function newVideo(videoID: string, callback: Object): string;
         function getVideo(videoId: string): Object;
         function submitVideo(data: any): boolean;
     }
 }
 declare var express: any;
 declare var bodyParser: any;
-declare var Utilities: typeof Xannathor.Utilities;
-declare var Wubloader: typeof Xannathor.WubloaderIntegration;
-declare var app: any;
+declare module Xannathor {
+    module Xannathor {
+        class Server {
+            private app;
+            constructor();
+            configureServerDefaults(): void;
+            configureGoogleAuth(): void;
+            configureVideoFunctions(): void;
+            newVideo(videoID: string, callback: Object): string;
+        }
+    }
+}
