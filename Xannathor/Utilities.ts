@@ -21,6 +21,7 @@ module Xannathor {
 					validation = true;
 				}
 			}
+			if(!validation) { Utilities.log("Failed Validation"); }
 			return validation;
 		}
 		
@@ -35,7 +36,7 @@ module Xannathor {
 				} else {
 					var userInfo = body.getPayload();
 					var userEmail = userInfo.email;
-					var authUserList = fs.readFileSync('../Resources/AuthenticatedUserList.txt').toString().split("\n");
+					var authUserList = fs.readFileSync(Constants.USERLISTLOCATION).toString().split("\n");
 					if (authUserList.indexOf(userEmail) >= 0) {
 						Utilities.log('User Authenticated: '+userEmail);
 						callback(true, Utilities.generateSessionId(userInfo));

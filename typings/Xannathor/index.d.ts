@@ -1,4 +1,19 @@
-/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../../typings/tsd.d.ts" />
+declare module Xannathor {
+    module Constants {
+        var HOSTNAME: string;
+        var PORT: number;
+        var EDITORPAGELOCATION: string;
+        var VIDEOSLOCATION: string;
+        var USERLISTLOCATION: string;
+        var TYPE: string;
+        var TITLE: string;
+        var DESCRIPTION: string;
+        var FRAMERATE: string;
+        var WIDTH: string;
+        var HEIGHT: string;
+    }
+}
 declare var fs: any;
 declare var GoogleAuth: any;
 declare module Xannathor {
@@ -13,7 +28,8 @@ declare module Xannathor {
 declare var fs: any;
 declare module Xannathor {
     module WubloaderIntegration {
-        function newVideo(videoID: string, callback: Object): string;
+        function newVideo(source: string, options: any, callback: Object): string;
+        function videosList(): Array<any>;
         function getVideo(videoId: string): Object;
         function submitVideo(data: any): boolean;
     }
@@ -24,11 +40,11 @@ declare module Xannathor {
     module Xannathor {
         class Server {
             private app;
-            constructor();
+            constructor(hostname: string, port: number, UserListLocation: string, VideosLocation: string);
             configureServerDefaults(): void;
             configureGoogleAuth(): void;
             configureVideoFunctions(): void;
-            newVideo(videoID: string, callback: Object): string;
+            newVideo(source: string, options: any, callback: Object): string;
         }
     }
 }

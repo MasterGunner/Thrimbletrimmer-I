@@ -10,17 +10,12 @@ gulp.task('build-Xannathor', function () {
         //tsp.typescript = typescript;
         var tsResult = tsp.src().pipe(ts(tsp));
         output.push(tsResult.js.pipe(gulp.dest('./')));
-        output.push(tsResult.dts.pipe(gulp.dest('./typings/')));
+        output.push(tsResult.dts.pipe(gulp.dest('./typings')));
     });
     return merge(output);
 });
 
-gulp.task('build-tests', function () {
-    var proj = ts.createProject('tests/tsconfig.json');
-    return proj.src().pipe(ts(proj)).js.pipe(gulp.dest('.'));
-});
-
-
+//For moving the new definition files from "./typings/bin" to "./typings"
 var del = require('del');
 var vinylPaths = require('vinyl-paths');
 gulp.task('build-clean', function () {
@@ -31,14 +26,28 @@ gulp.task('build-clean', function () {
         .pipe(gulp.dest('typings'));
 });
 
+gulp.task('build-Xannathor-package', function() {
+    //Package Xannathor Server as a node module.
+    gulp.src('./bin/Xannathor/**').pipe(vinylPaths(del)).pipe(gulp.dest('./bin/node_modules/Xannathor'));
+    gulp.src('./package.json').pipe(gulp.dest('./bin/node_modules/Xannathor')); 
+    gulp.src('./README.md').pipe(gulp.dest('./bin/node_modules/Xannathor')); 
+    //Copy the Typings to the bin.
+    gulp.src('./typings/Xannathor/**').pipe(gulp.dest('./bin/typings/Xannathor')); 
+    //Package the Thrimbletrimmer front-end into the node module.
+    gulp.src('./EditorPage/**').pipe(gulp.dest('./bin/node_modules/Xannathor/EditorPage'));
+    //gulp.src('./Resources/**').pipe(gulp.dest('./bin/node_modules/Xannathor/Resources'));
+    //gulp.src('./Videos/**').pipe(gulp.dest('./bin/node_modules/Xannathor/Videos'));  
+});
+
+//Minify the output.
 var uglify = require('gulp-uglify');
 gulp.task('minify', function () {
-    return gulp.src('bin/*.js')
+    return gulp.src('bin/**/*.js')
         .pipe(uglify())
         .pipe(gulp.dest('bin/'));
 });
 
 var runSequence = require('run-sequence');
 gulp.task('build', function () {
-    runSequence('build-Xannathor', 'build-tests', 'build-clean', 'minify');
+    runSequence('build-Xannathor', 'build-clean', 'build-Xannathor-package');
 });

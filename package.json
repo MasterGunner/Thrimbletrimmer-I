@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "description": "Dave's Discount Server",
   "main": "bin/Xannathor.js",
+  "typings":"bin/Xannathor",
+  "declaration":"true",
   "private": true,
   "dependencies": {
     "express": "4.13.3",

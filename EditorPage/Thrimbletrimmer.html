@@ -79,7 +79,9 @@
 		var CallForWubs = function(Callback) {
 			if(window.location.search.match(/video=(.*?)(&|$)/i)) {
 				var videoID = window.location.search.match(/video=(.*?)(&|$)/i)[1];
-				$.get('/getwubs/'+videoID+'?SessionId='+$('#g-signin-sessionId').text(),function(data) { Callback(data); },'json');
+				$.get('/getwubs/'+videoID+'?SessionId='+$('#g-signin-sessionId').text(),function(data) { Callback(data); },'json').fail(function() {
+					$('#EditorContent').append('<h1>Unable to retrieve requested video.</h1>');
+				});
 			}
 		};
 		

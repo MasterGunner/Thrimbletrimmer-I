@@ -6,6 +6,7 @@
 
 /// <reference path="Utilities.ts" />
 /// <reference path="WubloaderIntegration.ts" />
+/// <reference path="Constants.ts" />
 
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -15,15 +16,20 @@ module Xannathor {
 		export class Server {
 			private app: any; //Webserver base.
 			
-			constructor() {
+			constructor(hostname: string, port: number, UserListLocation:string, VideosLocation:string) {
 				//Insantiate and configure the base web server.
+				Constants.HOSTNAME = hostname;
+				Constants.PORT = port;
+				Constants.USERLISTLOCATION = UserListLocation;
+				Constants.VIDEOSLOCATION = VideosLocation;
+				
 				this.app = express();
 				this.configureServerDefaults();
 				this.configureGoogleAuth();
 				this.configureVideoFunctions();
 				
-				this.app.listen(1337);
-				Utilities.log('Server running at http://127.0.0.1:1337/');
+				this.app.listen(port);
+				Utilities.log('Server running at http://' + hostname + ':' + port);
 			}
 
 			//
@@ -33,12 +39,18 @@ module Xannathor {
 				//Set resources the server will need.
 				this.app.use(bodyParser.json());
 				this.app.use(bodyParser.urlencoded({extended:false}));
-				this.app.use(express.static('../EditorPage')); //Serves the Editor page and other static content.
-				this.app.use(express.static('../Videos')); //Serves the video chunks to edit.
+				this.app.use(express.static(Constants.EDITORPAGELOCATION)); //Serves the Editor page and other static content.
+				this.app.use(express.static(Constants.VIDEOSLOCATION)); //Serves the video chunks to edit.
 				
-				//Set Default Page. Only for testing purposes.
+				//Test Page for development.
 				this.app.get('/', function (req, res) {
-					res.sendFile('default.html', { root: __dirname + '/../Resources' } );
+					var indexPage = '';
+					WubloaderIntegration.videosList().forEach(function(video) {
+						indexPage += '<li><a href="/Thrimbletrimmer.html?Video='+video[0].vidID+'">'+video[0].vidID+'</a></li>'
+					});
+					indexPage = '<body><ul>' + indexPage + '</ul></body>'
+					res.type('html');
+					res.send(indexPage);
 				});
 			}
 			
@@ -66,7 +78,7 @@ module Xannathor {
 						if(videoData) {
 							res.json(videoData);
 						} else {
-							res.sendStatus(400);
+							res.sendStatus(404);
 						}
 					} else {
 						res.sendStatus(401);
@@ -75,7 +87,7 @@ module Xannathor {
 				
 				//Accept POST request with edit information.
 				this.app.post('/setwubs', function (req, res) {
-					Utilities.log(req.body);
+					Utilities.log("Recieved Edit Request");
 					if(Utilities.validateSessionId(req.body["extraMetadata[0][SessionId]"])) {
 						if (WubloaderIntegration.submitVideo(req.body)) {
 							res.send('Recieved Video Edits');
@@ -91,8 +103,8 @@ module Xannathor {
 			//
 			//Public Functions
 			//
-			newVideo(videoID: string, callback:Object): string {
-				return WubloaderIntegration.newVideo(videoID, callback);
+			newVideo(source:string, options:any, callback:Object): string {
+				return WubloaderIntegration.newVideo(source, options, callback);
 			}
 		}
 	}
