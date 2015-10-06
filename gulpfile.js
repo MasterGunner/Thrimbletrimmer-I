@@ -32,6 +32,7 @@ gulp.task('build-Thrimbletrimmer-package', function() {
     //Package Thrimbletrimmer/Xannathor Server as a node module.
     gulp.src('./package.json').pipe(gulp.dest('./bin/Thrimbletrimmer')); 
     gulp.src('./README.md').pipe(gulp.dest('./bin/Thrimbletrimmer')); 
+    gulp.src('./LICENSE').pipe(gulp.dest('./bin/Thrimbletrimmer')); 
     //Copy the Typings to the bin.
     gulp.src('./typings/Thrimbletrimmer/**').pipe(gulp.dest('./bin/typings/Thrimbletrimmer')); 
     //Package the Thrimbletrimmer front-end into the node module.

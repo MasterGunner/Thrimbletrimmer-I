@@ -28,8 +28,10 @@ Example returned URL:
 http://localhost:1337/Thrimbletrimmer.html?Video=7988
 
 Example return data for the callback function. 'Start' and 'End' are in seconds.
+```
 { vidID: '9135',
   start: '10',
   end: '591.926213',
   title: 'Desert Bus Clip',
   description: 'A clip from Desert Bus.' }
+  ```
