@@ -1,0 +1,8 @@
+Have the definition file named correctly rather than as index.js
+Update package.json
+Create Interfaces for the external methods.
+
+For Next Year:
+Convert the Thrimbletrimmer front-end to typescript.
+Better UI.
+Properly generate session IDs

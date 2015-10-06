@@ -2,7 +2,7 @@
 var fs = require('fs');
 var GoogleAuth = require('google-auth-library');
 
-module Xannathor {
+module Thrimbletrimmer {
 	export module Utilities {
 		//Logging
 		export function log (message:string): void {

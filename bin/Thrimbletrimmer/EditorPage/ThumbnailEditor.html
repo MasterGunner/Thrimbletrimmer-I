@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<title>Eustace W. Thrimbletrimmer Editing Suite</title>
+  
+	<script src="scripts/jquery-2.1.3.min.js"></script>
+	<script src="scripts/jquery-ui-1.11.4/jquery-ui.js"></script>
+	<script src="scripts/wubPlayerControls.js"></script>
+	<script src="scripts/wubThumbnailControls.js"></script>
+	<link rel="stylesheet" href="scripts/jquery-ui-1.11.4/jquery-ui.css">
+	<link rel="stylesheet" href="styles/wubPlayerControls.css">
+	<link rel="stylesheet" href="styles/wubThumbnailControls.css">
+</head>
+<body>
+	<div id="EditorContent">	
+	</div>
+	<script type="text/javascript">
+		var path = window.location.protocol + '//' + window.location.hostname;
+		var PageSetup = function() {
+			$('#EditorContent').append('<video id="wubPlayer" width="'+window.video_width+'" height="'+window.video_height+'" style="padding-top:2px;" >' +
+											'<source src="'+window.video_source+'" type="'+window.video_type+'" />' +
+											'Your browser does not support HTML5 video.' +
+										'</video>');
+			$('#wubPlayer').wVideo({startOffset:10});
+			$('#wubPlayer').wThumbEditor({framerate:window.video_framerate,tnWidth:window.video_width,tnHeight:window.video_height,tnAspectRatio:(window.video_width/window.video_height)});
+		};
+		
+		PageSetup();
+	</script>
+</body>
+</html>

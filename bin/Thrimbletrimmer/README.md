@@ -1,8 +1,7 @@
 Welcome to the Thrimbletrimmer!
 
 Example usage of the Node Module:
-
-```
+-----------------------------------------------------------------------------------------------
 /// <reference path="../typings/tsd.d.ts" />
 var Thrimbletrimmer = require('Thrimbletrimmer');
 var editor = new Thrimbletrimmer.Xannathor.Server('localhost',1337,'../Resources/AuthenticatedUserList.txt','../Videos');
@@ -22,12 +21,12 @@ url = editor.newVideo('DB-TestClip.mp4', {}, function(data) {
 	console.log(data);
 });
 console.log(url);
-```
+-----------------------------------------------------------------------------------------------
 
 Example returned URL:
 http://localhost:1337/Thrimbletrimmer.html?Video=7988
 
-Example return data for the callback function. 'Start' and 'End' are in seconds.
+Example return data for the callback function.
 { vidID: '9135',
   start: '10',
   end: '591.926213',

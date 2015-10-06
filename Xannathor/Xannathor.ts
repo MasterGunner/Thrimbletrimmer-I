@@ -11,7 +11,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 
-module Xannathor {
+module Thrimbletrimmer {
 	export module Xannathor {
 		export class Server {
 			private app: any; //Webserver base.

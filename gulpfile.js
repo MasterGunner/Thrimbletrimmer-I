@@ -2,9 +2,10 @@ var gulp = require('gulp');
 var ts = require('gulp-typescript');
 var merge = require('merge2');
 //var typescript = require('typescript');
- 
+
+//Compile the TypeScript project to JavaScript, and create the definition file.
 var tsProjects = [ts.createProject('Xannathor/tsconfig.json')];
-gulp.task('build-Xannathor', function () {
+gulp.task('build-Thrimbletrimmer', function () {
     var output = [];
     tsProjects.forEach(function (tsp) {
         //tsp.typescript = typescript;
@@ -26,21 +27,25 @@ gulp.task('build-clean', function () {
         .pipe(gulp.dest('typings'));
 });
 
-gulp.task('build-Xannathor-package', function() {
-    //Package Xannathor Server as a node module.
-    gulp.src('./bin/Xannathor/**').pipe(vinylPaths(del)).pipe(gulp.dest('./bin/node_modules/Xannathor'));
-    gulp.src('./package.json').pipe(gulp.dest('./bin/node_modules/Xannathor')); 
-    gulp.src('./README.md').pipe(gulp.dest('./bin/node_modules/Xannathor')); 
+//Build the node_module package.
+gulp.task('build-Thrimbletrimmer-package', function() {
+    //Package Thrimbletrimmer/Xannathor Server as a node module.
+    gulp.src('./package.json').pipe(gulp.dest('./bin/Thrimbletrimmer')); 
+    gulp.src('./README.md').pipe(gulp.dest('./bin/Thrimbletrimmer')); 
     //Copy the Typings to the bin.
-    gulp.src('./typings/Xannathor/**').pipe(gulp.dest('./bin/typings/Xannathor')); 
+    gulp.src('./typings/Thrimbletrimmer/**').pipe(gulp.dest('./bin/typings/Thrimbletrimmer')); 
     //Package the Thrimbletrimmer front-end into the node module.
-    gulp.src('./EditorPage/**').pipe(gulp.dest('./bin/node_modules/Xannathor/EditorPage'));
-    //gulp.src('./Resources/**').pipe(gulp.dest('./bin/node_modules/Xannathor/Resources'));
-    //gulp.src('./Videos/**').pipe(gulp.dest('./bin/node_modules/Xannathor/Videos'));  
+    gulp.src('./EditorPage/**').pipe(gulp.dest('./bin/Thrimbletrimmer/EditorPage'));
 });
 
-//Minify the output.
+//Minify the entire output.
 var uglify = require('gulp-uglify');
+gulp.task('minify-Thrimbletrimmer-UI', function () {
+    return gulp.src('EditorPage/scripts/*.js')
+        .pipe(uglify())
+        .pipe(gulp.dest('EditorPage/scripts/min'));
+});
+
 gulp.task('minify', function () {
     return gulp.src('bin/**/*.js')
         .pipe(uglify())
@@ -49,5 +54,5 @@ gulp.task('minify', function () {
 
 var runSequence = require('run-sequence');
 gulp.task('build', function () {
-    runSequence('build-Xannathor', 'build-clean', 'build-Xannathor-package');
+    runSequence('minify-Thrimbletrimmer-UI', 'build-Thrimbletrimmer', 'build-clean', 'build-Thrimbletrimmer-package');
 });

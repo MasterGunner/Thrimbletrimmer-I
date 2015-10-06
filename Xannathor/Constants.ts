@@ -1,6 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
 
-module Xannathor {
+module Thrimbletrimmer {
 	export module Constants {
 		export var HOSTNAME: string;
 		export var PORT: number;

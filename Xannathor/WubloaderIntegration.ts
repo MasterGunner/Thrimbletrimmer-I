@@ -3,11 +3,17 @@
 
 /// <reference path="../typings/tsd.d.ts" />
 var fs = require('fs');
-module Xannathor {
+module Thrimbletrimmer {
 	export module WubloaderIntegration {
 		var videos = []; //Array of videos ready for editing.
 		
+		//Makes a new video available for access in the web interface.
 		export function newVideo(source:string, options:any, callback:Object): string {
+			//Scale the video so it will be 640px wide while maintaining the same aspect ratio.
+			if(options.width) {
+				options.width = options.width*(options.width/640);
+				options.height = options.height*(options.width/640);
+			}
 			var details = {
 				vidID:generateID(),
 				src:source,
@@ -18,11 +24,12 @@ module Xannathor {
 				width:(options.width) ? options.type:Constants.WIDTH,
 				height:(options.height) ? options.type:Constants.HEIGHT
 			}
-			videos.push([details, callback]);
 			
+			videos.push([details, callback]);
 			return 'http://' + Constants.HOSTNAME + ((Constants.PORT == 80) ? '':(':' + Constants.PORT)) + '/Thrimbletrimmer.html?Video=' + details.vidID;
 		}
 		
+		//Generate an ID to use in the URL and for finding a video in the array again.
 		function generateID(): string {
 			var id = Math.floor(Math.random() * 10000).toString();
 			for (var i = 0; i < videos.length; i++) {

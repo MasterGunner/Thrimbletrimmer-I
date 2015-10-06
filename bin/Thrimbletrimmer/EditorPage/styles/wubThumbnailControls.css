@@ -1,0 +1,16 @@
+.wub-video-ThumbControls {
+	position:relative;
+	padding:5px;
+	padding-top:0px;
+	float:left;
+	clear:both;
+	width:100%;
+}
+
+#ElementList > li.active {
+	background-color: lightBlue;
+}
+
+#ElementOptions, #ElementAdd {
+	margin-left:20px;
+}

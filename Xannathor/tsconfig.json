@@ -3,7 +3,7 @@
         "target": "ES5",
         "module": "commonjs",
         "sourceMap": true,
-		"out":"bin/Xannathor/index.js",
+		"out":"bin/Thrimbletrimmer/index.js",
         "removeComments": true,
         "declaration": true
     }
