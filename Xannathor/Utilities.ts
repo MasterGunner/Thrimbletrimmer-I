@@ -25,6 +25,16 @@ module Thrimbletrimmer {
 			return validation;
 		}
 		
+		//
+		// Authentication Functions
+		//
+		
+		//Set up Authentication
+		var authorizedUsers = [];
+		export function loadAuthorizedUsers(): void {
+			authorizedUsers = fs.readFileSync(Constants.USERLISTLOCATION).toString().split("\n");
+		}
+		
 		//General Authentication
 		export function auth (id_token: string, callback: Function): void {
 			//Set up callback function.
@@ -36,10 +46,9 @@ module Thrimbletrimmer {
 				} else {
 					var userInfo = body.getPayload();
 					var userEmail = userInfo.email;
-					var authUserList = fs.readFileSync(Constants.USERLISTLOCATION).toString().split("\n");
-					if (authUserList.indexOf(userEmail) >= 0) {
+					if (authorizedUsers.indexOf(userEmail) >= 0) {
 						Utilities.log('User Authenticated: '+userEmail);
-						callback(true, Utilities.generateSessionId(userInfo));
+						callback(true, Utilities.generateSessionId());
 					} else {
 						Utilities.log('User Not Authenticated: '+userEmail);
 						callback(false, null);
@@ -57,11 +66,41 @@ module Thrimbletrimmer {
 		}
 		
 		//Replace these with better session handling using the express-session library?
-		export function generateSessionId (userInfo: any): string {
-			return '1234567890';
+		var sessionIDs = [];
+		export function generateSessionId(): string {
+			cleanSessionIDs(); //Clean out old Session IDs first.
+			if (sessionIDs.length > 5000) {
+				sessionIDs = []; //If there are more than 5000 session IDs, clear them all to prevent performance degredation.
+				log("Session ID array force-cleared. Sorry.");
+			}
+			
+			var sessionID = Math.floor(Math.random() * 10000).toString();
+			for (var i = 0; i < sessionIDs.length; i++) {
+				if (sessionID === sessionIDs[i][0]) {
+					generateSessionId();
+					break;
+				}
+			}
+			sessionIDs.push([sessionID, (new Date()).getTime()])
+			return sessionID;
 		}
-		export function validateSessionId (sessionId: string): boolean {
-			return (sessionId == '1234567890') ? true:false;
+		
+		export function validateSessionId (sessionID: string): boolean {
+			for (var i = 0; i < sessionIDs.length; i++) {
+				if(sessionIDs[i][0] == sessionID) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		export function cleanSessionIDs(): void {
+			var expireTime = ((new Date()).getTime() - 86400000);
+			for (var i = 0; i < sessionIDs.length; i++) {
+				if(sessionIDs[i][1] < expireTime) {
+					sessionIDs.splice(i,1); //Remove specified Session ID, and any other Session IDs more than 24h old.
+				}
+			}
 		}
 	}
 }

@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
 var merge = require('merge2');
+var rename = require('gulp-rename');
 //var typescript = require('typescript');
 
 //Compile the TypeScript project to JavaScript, and create the definition file.
@@ -11,7 +12,7 @@ gulp.task('build-Thrimbletrimmer', function () {
         //tsp.typescript = typescript;
         var tsResult = tsp.src().pipe(ts(tsp));
         output.push(tsResult.js.pipe(gulp.dest('./')));
-        output.push(tsResult.dts.pipe(gulp.dest('./typings')));
+        output.push(tsResult.dts.pipe(rename("Thrimbletrimmer/Thrimbletrimmer.d.ts")).pipe(gulp.dest('./typings')));
     });
     return merge(output);
 });

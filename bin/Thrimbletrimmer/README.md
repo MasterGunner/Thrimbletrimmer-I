@@ -10,14 +10,21 @@ var editor = new Thrimbletrimmer.Xannathor.Server('localhost',1337,'../Resources
 var url= '';
 
 url = editor.newVideo('oceans-clip-1234.mp4', 
-							{type:'video/mp4',title:'Test Title',description:'Test Description',framerate:'24',width:'640',height:'264'}, 
+							{type:'video/mp4',
+							title:'Test Title',
+							description:'Test Description',
+							framerate:'24',
+							width:'640',
+							height:'264'}, 
+							false, //Do not delete video from queue on submission.
 							function(data) {
 	console.log("Success!")
 	console.log(data);
 });
 console.log(url);
 
-url = editor.newVideo('DB-TestClip.mp4', {}, function(data) {
+//This will use the default properties, and delete the video from the queue on submission.
+url = editor.newVideo('DB-TestClip.mp4', {}, true, function(data) {
 	console.log("Success!")
 	console.log(data);
 });
@@ -29,9 +36,30 @@ http://localhost:1337/Thrimbletrimmer.html?Video=7988
 
 Example return data for the callback function. 'Start' and 'End' are in seconds.
 ```
-{ vidID: '9135',
+{ vidID: '2549',
   start: '10',
   end: '591.926213',
   title: 'Desert Bus Clip',
-  description: 'A clip from Desert Bus.' }
-  ```
+  description: 'A clip from Desert Bus.',
+  source: 'DB-TestClip.mp4',
+  type: 'video/mp4',
+  framerate: '30',
+  width: '640',
+  height: '360',
+  deleteOnSubmit: true }
+ ```
+  
+If the contents of the Authenticated User List changes, you can reload it:
+```
+editor.Utilities.loadAuthorizedUsers()
+``` 
+
+Default video property values:
+Name|Property
+----|--------
+type|"video/mp4"
+title|"Desert Bus Clip"
+description|"A clip from Desert Bus."
+framerate|"30"
+width|"640"
+height|"360"

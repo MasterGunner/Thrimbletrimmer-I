@@ -25,7 +25,7 @@ module Thrimbletrimmer {
 				
 				this.app = express();
 				this.configureServerDefaults();
-				this.configureGoogleAuth();
+				this.configureAuth();
 				this.configureVideoFunctions();
 				
 				this.app.listen(port);
@@ -45,7 +45,7 @@ module Thrimbletrimmer {
 				//Test Page for development.
 				this.app.get('/', function (req, res) {
 					var indexPage = '';
-					WubloaderIntegration.videosList().forEach(function(video) {
+					WubloaderIntegration.getVideos().forEach(function(video) {
 						indexPage += '<li><a href="/Thrimbletrimmer.html?Video='+video[0].vidID+'">'+video[0].vidID+'</a></li>'
 					});
 					indexPage = '<body><ul>' + indexPage + '</ul></body>'
@@ -54,7 +54,7 @@ module Thrimbletrimmer {
 				});
 			}
 			
-			configureGoogleAuth(): void {
+			configureAuth(): void {
 				//Initial Authentication
 				this.app.post('/tokensignin', function (req, res) {
 					//Utilities.log(req.body);
@@ -68,6 +68,9 @@ module Thrimbletrimmer {
 						}
 					});
 				});
+				
+				//Load authenticated user list.
+				Utilities.loadAuthorizedUsers();
 			}
 			
 			configureVideoFunctions(): void {
@@ -103,8 +106,8 @@ module Thrimbletrimmer {
 			//
 			//Public Functions
 			//
-			newVideo(source:string, options:any, callback:Object): string {
-				return WubloaderIntegration.newVideo(source, options, callback);
+			newVideo(source:string, options:any, deleteOnSubmit:boolean, callback:Object): string {
+				return WubloaderIntegration.newVideo(source, options, deleteOnSubmit, callback);
 			}
 		}
 	}

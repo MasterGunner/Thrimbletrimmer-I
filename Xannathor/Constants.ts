@@ -2,6 +2,7 @@
 
 module Thrimbletrimmer {
 	export module Constants {
+		//General
 		export var HOSTNAME: string;
 		export var PORT: number;
 		

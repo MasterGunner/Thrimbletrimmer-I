@@ -8,21 +8,21 @@ module Thrimbletrimmer {
 		var videos = []; //Array of videos ready for editing.
 		
 		//Makes a new video available for access in the web interface.
-		export function newVideo(source:string, options:any, callback:Object): string {
-			//Scale the video so it will be 640px wide while maintaining the same aspect ratio.
-			if(options.width) {
-				options.width = options.width*(options.width/640);
-				options.height = options.height*(options.width/640);
+		export function newVideo(source:string, options:any, deleteOnSubmit:boolean, callback:Object): string {
+			if (videos.length > 5000) {
+				Utilities.log('Too many videos in buffer, sorry.'); 
+				return 'Too many videos in buffer, sorry.'; //If there are more than 5000 vidoes in the buffer, stop adding more. 
 			}
 			var details = {
-				vidID:generateID(),
+				vidID:generateVideoID(),
 				src:source,
 				type:(options.type) ? options.type:Constants.TYPE,
-				title:(options.title) ? options.type:Constants.TITLE,
-				description:(options.description) ? options.type:Constants.DESCRIPTION,
-				framerate:(options.framerate) ? options.type:Constants.FRAMERATE,
-				width:(options.width) ? options.type:Constants.WIDTH,
-				height:(options.height) ? options.type:Constants.HEIGHT
+				title:(options.title) ? options.title:Constants.TITLE,
+				description:(options.description) ? options.description:Constants.DESCRIPTION,
+				framerate:(options.framerate) ? options.framerate:Constants.FRAMERATE,
+				width:(options.width) ? options.width:Constants.WIDTH,
+				height:(options.height) ? options.height:Constants.HEIGHT,
+				deleteOnSubmit:deleteOnSubmit
 			}
 			
 			videos.push([details, callback]);
@@ -30,18 +30,18 @@ module Thrimbletrimmer {
 		}
 		
 		//Generate an ID to use in the URL and for finding a video in the array again.
-		function generateID(): string {
+		function generateVideoID(): string {
 			var id = Math.floor(Math.random() * 10000).toString();
 			for (var i = 0; i < videos.length; i++) {
 				if (id === videos[i][0].vidID) {
-					generateID();
+					generateVideoID();
 					break;
 				}
 			};
 			return id;
 		}
 		
-		export function videosList(): Array<any> {
+		export function getVideos(): Array<any> {
 			return videos;
 		}
 		
@@ -79,8 +79,18 @@ module Thrimbletrimmer {
 				try {
 					for (var i = 0; i < videos.length; i++) {
 						if (videos[i][0].vidID == data.vidID) {
+							//Remove the session ID, and add in all the parameters not provided by Eustace.
+							delete data["extraMetadata[0][SessionId]"];
+							data.source = videos[i][0].src;
+							data.type = videos[i][0].type;
+							data.framerate = videos[i][0].framerate;
+							data.width = videos[i][0].width;
+							data.height = videos[i][0].height;
+							data.deleteOnSubmit = videos[i][0].deleteOnSubmit;
+							//Initiate the callback function associated with the video.
 							videos[i][1](data);
-							videos.splice(i,1);
+							//Removes the video from the array.
+							if(videos[i][0].deleteOnSubmit) { videos.splice(i,1); }
 							successfulSubmission = true;
 							break;
 						}

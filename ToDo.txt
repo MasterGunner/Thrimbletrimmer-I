@@ -1,8 +1,8 @@
-Have the definition file named correctly rather than as index.js
-Update package.json
 Create Interfaces for the external methods.
 
 For Next Year:
 Convert the Thrimbletrimmer front-end to typescript.
 Better UI.
-Properly generate session IDs
+Properly do session handling.
+Move the Google Client ID to be something passed in from Xannathor on page load, so it can be passed into the constructor.
+Split up Auth and Video functions into their own module (rather than Utilities and Wubloader Integration)
