@@ -3,15 +3,16 @@ declare module Thrimbletrimmer {
     module Constants {
         var HOSTNAME: string;
         var PORT: number;
+        var USERLISTLOCATION: string;
+        var LOGFOLDER: string;
         var EDITORPAGELOCATION: string;
         var VIDEOSLOCATION: string;
-        var USERLISTLOCATION: string;
         var TYPE: string;
         var TITLE: string;
         var DESCRIPTION: string;
-        var FRAMERATE: string;
-        var WIDTH: string;
-        var HEIGHT: string;
+        var FRAMERATE: number;
+        var WIDTH: number;
+        var HEIGHT: number;
     }
 }
 declare var fs: any;
@@ -19,7 +20,7 @@ declare var GoogleAuth: any;
 declare module Thrimbletrimmer {
     module Utilities {
         function log(message: string): void;
-        function validateVideoSubmission(data: any): boolean;
+        function validateVideoSubmission(data: WubloaderIntegration.video): boolean;
         function loadAuthorizedUsers(): void;
         function auth(id_token: string, callback: Function): void;
         function generateSessionId(): string;
@@ -30,10 +31,23 @@ declare module Thrimbletrimmer {
 declare var fs: any;
 declare module Thrimbletrimmer {
     module WubloaderIntegration {
-        function newVideo(source: string, options: any, deleteOnSubmit: boolean, callback: Object): string;
-        function getVideos(): Array<any>;
-        function getVideo(videoId: string): Object;
-        function submitVideo(data: any): boolean;
+        interface video {
+            vidID?: string;
+            title?: string;
+            description?: string;
+            startOffset?: number;
+            endOffset?: number;
+            source?: string;
+            type?: string;
+            framerate?: number;
+            width?: number;
+            height?: number;
+            deleteOnSubmit?: boolean;
+        }
+        function newVideo(source: string, options: video, deleteOnSubmit: boolean, callback: Function): string;
+        function getVideos(): Array<[video, Function]>;
+        function getVideo(videoId: string): video;
+        function submitVideo(data: video): boolean;
     }
 }
 declare var express: any;
@@ -42,11 +56,11 @@ declare module Thrimbletrimmer {
     module Xannathor {
         class Server {
             private app;
-            constructor(hostname: string, port: number, UserListLocation: string, VideosLocation: string);
+            constructor(hostname: string, port: number, UserListLocation: string, VideosLocation: string, LogFolder: string);
             configureServerDefaults(): void;
             configureAuth(): void;
             configureVideoFunctions(): void;
-            newVideo(source: string, options: any, deleteOnSubmit: boolean, callback: Object): string;
+            newVideo(source: string, options: WubloaderIntegration.video, deleteOnSubmit: boolean, callback: Function): string;
         }
     }
 }

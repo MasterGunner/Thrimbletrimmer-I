@@ -144,8 +144,8 @@
 						} else {
 							var data = {
 								vidID:options.vidID,
-								start:startSeconds,
-								end:endSeconds,
+								startOffset:startSeconds,
+								endOffset:endSeconds,
 								title:$wub_editor_Title.val(),
 								description:$wub_editor_Description.val(),
 								extraMetadata:options.extraMetadata()

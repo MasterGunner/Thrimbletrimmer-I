@@ -16,12 +16,13 @@ module Thrimbletrimmer {
 		export class Server {
 			private app: any; //Webserver base.
 			
-			constructor(hostname: string, port: number, UserListLocation:string, VideosLocation:string) {
+			constructor(hostname: string, port: number, UserListLocation:string, VideosLocation:string, LogFolder:string) {
 				//Insantiate and configure the base web server.
 				Constants.HOSTNAME = hostname;
 				Constants.PORT = port;
 				Constants.USERLISTLOCATION = UserListLocation;
 				Constants.VIDEOSLOCATION = VideosLocation;
+				Constants.LOGFOLDER = LogFolder;
 				
 				this.app = express();
 				this.configureServerDefaults();
@@ -106,7 +107,7 @@ module Thrimbletrimmer {
 			//
 			//Public Functions
 			//
-			newVideo(source:string, options:any, deleteOnSubmit:boolean, callback:Object): string {
+			newVideo(source:string, options:WubloaderIntegration.video, deleteOnSubmit:boolean, callback:Function): string {
 				return WubloaderIntegration.newVideo(source, options, deleteOnSubmit, callback);
 			}
 		}

@@ -7,21 +7,38 @@ module Thrimbletrimmer {
 	export module WubloaderIntegration {
 		var videos = []; //Array of videos ready for editing.
 		
+		export interface video {
+			vidID?: string;
+			title?: string;
+			description?: string;
+			startOffset?: number;
+			endOffset?: number;
+			source?: string;
+			type?: string;
+			framerate?: number;
+			width?: number;
+			height?: number;
+			deleteOnSubmit?: boolean;
+		}
+		
 		//Makes a new video available for access in the web interface.
-		export function newVideo(source:string, options:any, deleteOnSubmit:boolean, callback:Object): string {
+		export function newVideo(source:string, options:video, deleteOnSubmit:boolean, callback:Function): string {
 			if (videos.length > 5000) {
 				Utilities.log('Too many videos in buffer, sorry.'); 
 				return 'Too many videos in buffer, sorry.'; //If there are more than 5000 vidoes in the buffer, stop adding more. 
 			}
-			var details = {
+			
+			var details: video = {
 				vidID:generateVideoID(),
-				src:source,
+				source:source,
 				type:(options.type) ? options.type:Constants.TYPE,
 				title:(options.title) ? options.title:Constants.TITLE,
 				description:(options.description) ? options.description:Constants.DESCRIPTION,
 				framerate:(options.framerate) ? options.framerate:Constants.FRAMERATE,
 				width:(options.width) ? options.width:Constants.WIDTH,
 				height:(options.height) ? options.height:Constants.HEIGHT,
+				startOffset:(options.startOffset) ? options.startOffset:0,
+				endOffset:(options.endOffset) ? options.endOffset:0,
 				deleteOnSubmit:deleteOnSubmit
 			}
 			
@@ -41,28 +58,17 @@ module Thrimbletrimmer {
 			return id;
 		}
 		
-		export function getVideos(): Array<any> {
+		export function getVideos(): Array<[video,Function]> {
 			return videos;
 		}
 		
 		//Get a single video from the 'Videos' array based on the generated VideoID.
-		export function getVideo(videoId: string): Object {
+		export function getVideo(videoId: string): video {
 			var response = null;
 			try {
 				for (var i = 0; i < videos.length; i++) {
 					if(videos[i][0].vidID == videoId) {
-						var video = videos[i][0];
-						var data = { 
-							vidID:video.vidID,
-							src:video.src,
-							type:video.type,
-							title:video.title,
-							description:video.description,
-							framerate:video.framerate,
-							width:video.width,
-							height:video.height
-						};
-						response = data;
+						response = videos[i][0];
 						break;
 					}
 				}
@@ -73,7 +79,7 @@ module Thrimbletrimmer {
 		}
 		
 		//Submits requested edits to the callback function of the associated video, and removes it from the array.
-		export function submitVideo(data): boolean {
+		export function submitVideo(data: video): boolean {
 			var successfulSubmission = false;
 			if(Utilities.validateVideoSubmission(data)) {
 				try {
@@ -81,7 +87,7 @@ module Thrimbletrimmer {
 						if (videos[i][0].vidID == data.vidID) {
 							//Remove the session ID, and add in all the parameters not provided by Eustace.
 							delete data["extraMetadata[0][SessionId]"];
-							data.source = videos[i][0].src;
+							data.source = videos[i][0].source;
 							data.type = videos[i][0].type;
 							data.framerate = videos[i][0].framerate;
 							data.width = videos[i][0].width;

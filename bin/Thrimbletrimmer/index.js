@@ -7,9 +7,9 @@ var Thrimbletrimmer;
         Constants.TYPE = "video/mp4";
         Constants.TITLE = "Desert Bus Clip";
         Constants.DESCRIPTION = "A clip from Desert Bus.";
-        Constants.FRAMERATE = "30";
-        Constants.WIDTH = "640";
-        Constants.HEIGHT = "360";
+        Constants.FRAMERATE = 30;
+        Constants.WIDTH = 640;
+        Constants.HEIGHT = 360;
     })(Constants = Thrimbletrimmer.Constants || (Thrimbletrimmer.Constants = {}));
 })(Thrimbletrimmer || (Thrimbletrimmer = {}));
 /// <reference path="../typings/tsd.d.ts" />
@@ -22,20 +22,23 @@ var Thrimbletrimmer;
     var Utilities;
     (function (Utilities) {
         function log(message) {
+            var datetime = (new Date()).toISOString().split("T");
+            message = datetime[1] + " - " + message;
+            var logFile = Thrimbletrimmer.Constants.LOGFOLDER + "/" + Thrimbletrimmer.Constants.HOSTNAME + datetime[0] + ".log";
+            fs.appendFile(logFile, message, function (err) { if (err)
+                throw err; });
             console.log(message);
         }
         Utilities.log = log;
         function validateVideoSubmission(data) {
-            var validation = false;
-            if (data.vidID && data.start && data.end && data.title && data.description) {
-                if (data.start < data.end && data.title.length <= 91) {
-                    validation = true;
+            if (data.vidID && data.startOffset && data.endOffset && data.title && data.description) {
+                if (data.startOffset < data.endOffset && data.title.length <= 91) {
+                    return true;
                 }
             }
-            if (!validation) {
-                Utilities.log("Failed Validation");
-            }
-            return validation;
+            Utilities.log("Failed Validation");
+            Utilities.log(data.toString());
+            return false;
         }
         Utilities.validateVideoSubmission = validateVideoSubmission;
         var authorizedUsers = [];
@@ -125,13 +128,15 @@ var Thrimbletrimmer;
             }
             var details = {
                 vidID: generateVideoID(),
-                src: source,
+                source: source,
                 type: (options.type) ? options.type : Thrimbletrimmer.Constants.TYPE,
                 title: (options.title) ? options.title : Thrimbletrimmer.Constants.TITLE,
                 description: (options.description) ? options.description : Thrimbletrimmer.Constants.DESCRIPTION,
                 framerate: (options.framerate) ? options.framerate : Thrimbletrimmer.Constants.FRAMERATE,
                 width: (options.width) ? options.width : Thrimbletrimmer.Constants.WIDTH,
                 height: (options.height) ? options.height : Thrimbletrimmer.Constants.HEIGHT,
+                startOffset: (options.startOffset) ? options.startOffset : 0,
+                endOffset: (options.endOffset) ? options.endOffset : 0,
                 deleteOnSubmit: deleteOnSubmit
             };
             videos.push([details, callback]);
@@ -158,18 +163,7 @@ var Thrimbletrimmer;
             try {
                 for (var i = 0; i < videos.length; i++) {
                     if (videos[i][0].vidID == videoId) {
-                        var video = videos[i][0];
-                        var data = {
-                            vidID: video.vidID,
-                            src: video.src,
-                            type: video.type,
-                            title: video.title,
-                            description: video.description,
-                            framerate: video.framerate,
-                            width: video.width,
-                            height: video.height
-                        };
-                        response = data;
+                        response = videos[i][0];
                         break;
                     }
                 }
@@ -187,7 +181,7 @@ var Thrimbletrimmer;
                     for (var i = 0; i < videos.length; i++) {
                         if (videos[i][0].vidID == data.vidID) {
                             delete data["extraMetadata[0][SessionId]"];
-                            data.source = videos[i][0].src;
+                            data.source = videos[i][0].source;
                             data.type = videos[i][0].type;
                             data.framerate = videos[i][0].framerate;
                             data.width = videos[i][0].width;
@@ -225,11 +219,12 @@ var Thrimbletrimmer;
     var Xannathor;
     (function (Xannathor) {
         var Server = (function () {
-            function Server(hostname, port, UserListLocation, VideosLocation) {
+            function Server(hostname, port, UserListLocation, VideosLocation, LogFolder) {
                 Thrimbletrimmer.Constants.HOSTNAME = hostname;
                 Thrimbletrimmer.Constants.PORT = port;
                 Thrimbletrimmer.Constants.USERLISTLOCATION = UserListLocation;
                 Thrimbletrimmer.Constants.VIDEOSLOCATION = VideosLocation;
+                Thrimbletrimmer.Constants.LOGFOLDER = LogFolder;
                 this.app = express();
                 this.configureServerDefaults();
                 this.configureAuth();

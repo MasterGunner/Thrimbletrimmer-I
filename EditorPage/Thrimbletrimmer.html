@@ -69,8 +69,6 @@
 	<div id="EditorContent" style="float:left;"></div>
 	<script type="text/javascript">
 		var path = window.location.protocol + '//' + window.location.hostname;
-		var _startOffset = 10;
-		var _endOffset = 10;
 		
 		var getExtraData = function() {
 			var extraData = [{SessionId:$('#g-signin-sessionId').text()}];
@@ -90,13 +88,13 @@
 			var scaling = wubs.width/640;
 			wubs.Width = wubs.width*scaling;
 			wubs.height = wubs.height*scaling;
-			$('#EditorContent').append('<video id="wubPlayer" width="'+wubs.width+'" height="'+wubs.height+'" style="padding-top:2px;" vidID='+wubs.vidID+'>' +
-											'<source src="'+wubs.src+'" type="'+wubs.type+'" />' +
+			$('#EditorContent').append('<video id="wubPlayer" width="'+wubs.width+'" height="'+wubs.height+'" style="padding-top:2px;" vidID="'+wubs.vidID+'">' +
+											'<source src="'+wubs.source+'" type="'+wubs.type+'" />' +
 											'Your browser does not support HTML5 video.' +
 										'</video>');
-			$('#wubPlayer').wVideo({startOffset:_startOffset}); //Set start time for playing the video.
+			$('#wubPlayer').wVideo({startOffset:wubs.startOffset}); //Set start time for playing the video.
 			//Call the video editor controls plugin.
-			$('#wubPlayer').wEditor({submitLoc:'/setwubs', startOffset:_startOffset, endOffset:_endOffset, vidID:wubs.vidID, title:wubs.title, description:wubs.description, extraMetadata:getExtraData});
+			$('#wubPlayer').wEditor({submitLoc:'/setwubs', startOffset:wubs.startOffset, endOffset:wubs.endOffset, vidID:wubs.vidID, title:wubs.title, description:wubs.description, extraMetadata:getExtraData});
 			
 		};
 		

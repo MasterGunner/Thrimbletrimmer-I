@@ -1,8 +1,10 @@
-Create Interfaces for the external methods.
+Error handling!
 
 For Next Year:
 Convert the Thrimbletrimmer front-end to typescript.
+Combine Eustace Web page and plug into a more cohesive single whole - less content generated on page load. Mainly, stick the Web player and controls in the actual html.
 Better UI.
 Properly do session handling.
 Move the Google Client ID to be something passed in from Xannathor on page load, so it can be passed into the constructor.
 Split up Auth and Video functions into their own module (rather than Utilities and Wubloader Integration)
+Investigate which functions actually need to be exported.

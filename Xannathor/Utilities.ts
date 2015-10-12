@@ -6,23 +6,24 @@ module Thrimbletrimmer {
 	export module Utilities {
 		//Logging
 		export function log (message:string): void {
+			var datetime = (new Date()).toISOString().split("T");
+			message = datetime[1] + " - " + message;
+			var logFile = Constants.LOGFOLDER + "/" + Constants.HOSTNAME + datetime[0] + ".log" 
+			fs.appendFile(logFile, message, function(err) { if (err) throw err; }); 
 			console.log(message);
 		}
 		
-		/*export function log (...message: any[]): void {
-			console.log(message.join(" "));
-		}*/
-		
 		//Video Input Validation
-		export function validateVideoSubmission (data: any): boolean { 
-			var validation = false;
-			if(data.vidID && data.start && data.end && data.title && data.description) {
-				if(data.start < data.end && data.title.length <= 91 ) {
-					validation = true;
+		export function validateVideoSubmission (data: WubloaderIntegration.video): boolean { 
+			if(data.vidID && data.startOffset && data.endOffset && data.title && data.description) {
+				if(data.startOffset < data.endOffset && data.title.length <= 91 ) {
+					return true;
 				}
 			}
-			if(!validation) { Utilities.log("Failed Validation"); }
-			return validation;
+			
+			Utilities.log("Failed Validation"); 
+			Utilities.log(data.toString())
+			return false;
 		}
 		
 		//

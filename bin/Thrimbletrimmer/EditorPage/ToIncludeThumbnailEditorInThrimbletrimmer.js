@@ -1,3 +1,4 @@
+/*
 //Add thumbnailInfo as global variable that the plugin can write to.
 var thumbnailInfo = {};
 
@@ -19,3 +20,4 @@ var AddThumbnailEditor(wubs) = function {
 		thumbnailEditor.video_framerate = wubs.framerate;
 	});
 }
+*/
