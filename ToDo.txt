@@ -1,6 +1,7 @@
 Error handling!
 
 For Next Year:
+Re-implement Thrimbletrimmer in AngularJS.
 Convert the Thrimbletrimmer front-end to typescript.
 Combine Eustace Web page and plug into a more cohesive single whole - less content generated on page load. Mainly, stick the Web player and controls in the actual html.
 Better UI.
