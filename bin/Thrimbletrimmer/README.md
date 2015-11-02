@@ -34,7 +34,7 @@ console.log(url);
 Example returned URL:
 http://localhost:1337/Thrimbletrimmer.html?Video=7988
 
-Example return data for the callback function. 'Start' and 'End' are in seconds.
+Example return data for the callback function. 'startOffset' and 'endOffset' are in seconds.
 ```
 { vidID: '2549',
   startOffset: '10',
