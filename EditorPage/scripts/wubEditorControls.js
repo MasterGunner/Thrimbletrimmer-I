@@ -68,13 +68,20 @@
 			//Configure Editor Controls
 			var createRange = function() {
 				if(video.readyState) {
+					//Set initial start and end values
+					(options.endOffset == 0) ? video.duration:options.endOffset; //set end offset to the end of the video, if not set by server.
+					startSeconds = options.startOffset;
+					endSeconds = options.endOffset;
+					$wub_editor_start.val(getTimeFormat(startSeconds));
+					$wub_editor_stop.val(getTimeFormat(endSeconds));
+					
 					//Create the Segment Selection bar.
 					$wub_editor_range.slider({
 						range: true,
 						min: 0,
 						max: video.duration,
 						step: 0.01,					
-						values: [options.startOffset, video.duration - options.endOffset],
+						values: [options.startOffset, options.endOffset],
 						slide: function(event, ui){
 							startSeconds = ui.values[0];
 							endSeconds = ui.values[1];
@@ -82,12 +89,6 @@
 							$wub_editor_stop.val(getTimeFormat(endSeconds));
 						}
 					});
-					
-					//Set initial start and end values
-					startSeconds = options.startOffset;
-					endSeconds = video.duration - options.endOffset;
-					$wub_editor_start.val(getTimeFormat(startSeconds));
-					$wub_editor_stop.val(getTimeFormat(endSeconds));
 					
 					//Configure Start Timestamp Control
 					$wub_editor_setStartBtn.click(function() {
