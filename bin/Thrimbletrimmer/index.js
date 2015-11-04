@@ -102,7 +102,7 @@ var Thrimbletrimmer;
         }
         Utilities.validateSessionId = validateSessionId;
         function cleanSessionIDs() {
-            var expireTime = ((new Date()).getTime() - 86400000);
+            var expireTime = ((new Date()).getTime() - 43200000);
             for (var i = 0; i < sessionIDs.length; i++) {
                 if (sessionIDs[i][1] < expireTime) {
                     sessionIDs.splice(i, 1);
@@ -121,13 +121,10 @@ var Thrimbletrimmer;
     var WubloaderIntegration;
     (function (WubloaderIntegration) {
         var videos = [];
+        var maxGenID = 0;
         function newVideo(source, options, deleteOnSubmit, callback) {
-            if (videos.length > 5000) {
-                Thrimbletrimmer.Utilities.log('Too many videos in buffer, sorry.');
-                return 'Too many videos in buffer, sorry.';
-            }
             var details = {
-                vidID: generateVideoID(),
+                vidID: (options.vidID) ? options.vidID : (maxGenID++).toString(),
                 source: source,
                 type: (options.type) ? options.type : Thrimbletrimmer.Constants.TYPE,
                 title: (options.title) ? options.title : Thrimbletrimmer.Constants.TITLE,
@@ -143,17 +140,6 @@ var Thrimbletrimmer;
             return 'http://' + Thrimbletrimmer.Constants.HOSTNAME + ((Thrimbletrimmer.Constants.PORT == 80) ? '' : (':' + Thrimbletrimmer.Constants.PORT)) + '/Thrimbletrimmer.html?Video=' + details.vidID;
         }
         WubloaderIntegration.newVideo = newVideo;
-        function generateVideoID() {
-            var id = Math.floor(Math.random() * 10000).toString();
-            for (var i = 0; i < videos.length; i++) {
-                if (id === videos[i][0].vidID) {
-                    generateVideoID();
-                    break;
-                }
-            }
-            ;
-            return id;
-        }
         function getVideos() {
             return videos;
         }

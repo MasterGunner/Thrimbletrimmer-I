@@ -96,10 +96,10 @@ module Thrimbletrimmer {
 		}
 		
 		export function cleanSessionIDs(): void {
-			var expireTime = ((new Date()).getTime() - 86400000);
+			var expireTime = ((new Date()).getTime() - 43200000); //Set expire time to 12 hours
 			for (var i = 0; i < sessionIDs.length; i++) {
 				if(sessionIDs[i][1] < expireTime) {
-					sessionIDs.splice(i,1); //Remove specified Session ID, and any other Session IDs more than 24h old.
+					sessionIDs.splice(i,1); //Remove specified Session ID, and any other Session IDs more than 12h old.
 				}
 			}
 		}

@@ -6,6 +6,7 @@ var fs = require('fs');
 module Thrimbletrimmer {
 	export module WubloaderIntegration {
 		var videos = []; //Array of videos ready for editing.
+		var maxGenID = 0;
 		
 		export interface video {
 			vidID?: string;
@@ -23,13 +24,8 @@ module Thrimbletrimmer {
 		
 		//Makes a new video available for access in the web interface.
 		export function newVideo(source:string, options:video, deleteOnSubmit:boolean, callback:Function): string {
-			if (videos.length > 5000) {
-				Utilities.log('Too many videos in buffer, sorry.'); 
-				return 'Too many videos in buffer, sorry.'; //If there are more than 5000 vidoes in the buffer, stop adding more. 
-			}
-			
 			var details: video = {
-				vidID:generateVideoID(),
+				vidID: (options.vidID) ? options.vidID:(maxGenID++).toString(),
 				source:source,
 				type:(options.type) ? options.type:Constants.TYPE,
 				title:(options.title) ? options.title:Constants.TITLE,
@@ -44,18 +40,6 @@ module Thrimbletrimmer {
 			
 			videos.push([details, callback]);
 			return 'http://' + Constants.HOSTNAME + ((Constants.PORT == 80) ? '':(':' + Constants.PORT)) + '/Thrimbletrimmer.html?Video=' + details.vidID;
-		}
-		
-		//Generate an ID to use in the URL and for finding a video in the array again.
-		function generateVideoID(): string {
-			var id = Math.floor(Math.random() * 10000).toString();
-			for (var i = 0; i < videos.length; i++) {
-				if (id === videos[i][0].vidID) {
-					generateVideoID();
-					break;
-				}
-			};
-			return id;
 		}
 		
 		export function getVideos(): Array<[video,Function]> {

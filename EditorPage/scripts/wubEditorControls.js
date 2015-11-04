@@ -23,7 +23,7 @@
 			//create html structure
 			var $editor_controls = $('<div class="wub-video-editorControls" >' +
 										'<div class="wub-editor-selectRange"></div>' +
-										'<input type="checkbox" id="EndPlaybackCheckbox" checked="checked" />' +
+										'<input type="checkbox" id="EndPlaybackCheckbox" />' +
 										'<span style="font-size: 0.7em; color:#999">Stop Here</span>' +
 										'<div style="clear:both;">' +
 											'<div id="StartControl">' +
