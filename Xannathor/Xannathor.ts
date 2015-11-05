@@ -16,17 +16,16 @@ module Thrimbletrimmer {
 		export class Server {
 			private app: any; //Webserver base.
 			
-			constructor(hostname: string, port: number, UserListLocation:string, VideosLocation:string, LogFolder:string) {
+			constructor(hostname: string, port: number, UserList:Array<string>, VideosLocation:string, LogFolder:string) {
 				//Insantiate and configure the base web server.
 				Constants.HOSTNAME = hostname;
 				Constants.PORT = port;
-				Constants.USERLISTLOCATION = UserListLocation;
 				Constants.VIDEOSLOCATION = VideosLocation;
 				Constants.LOGFOLDER = LogFolder;
 				
 				this.app = express();
 				this.configureServerDefaults();
-				this.configureAuth();
+				this.configureAuth(UserList);
 				this.configureVideoFunctions();
 				
 				this.app.listen(port);
@@ -55,7 +54,7 @@ module Thrimbletrimmer {
 				});
 			}
 			
-			configureAuth(): void {
+			configureAuth(UserList:Array<string>): void {
 				//Initial Authentication
 				this.app.post('/tokensignin', function (req, res) {
 					//Utilities.log(req.body);
@@ -71,7 +70,7 @@ module Thrimbletrimmer {
 				});
 				
 				//Load authenticated user list.
-				Utilities.loadAuthorizedUsers();
+				Utilities.authorizedUsers = UserList;
 			}
 			
 			configureVideoFunctions(): void {

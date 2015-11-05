@@ -3,7 +3,6 @@ declare module Thrimbletrimmer {
     module Constants {
         var HOSTNAME: string;
         var PORT: number;
-        var USERLISTLOCATION: string;
         var LOGFOLDER: string;
         var EDITORPAGELOCATION: string;
         var VIDEOSLOCATION: string;
@@ -21,7 +20,7 @@ declare module Thrimbletrimmer {
     module Utilities {
         function log(message: string): void;
         function validateVideoSubmission(data: WubloaderIntegration.video): boolean;
-        function loadAuthorizedUsers(): void;
+        var authorizedUsers: any[];
         function auth(id_token: string, callback: Function): void;
         function generateSessionId(): string;
         function validateSessionId(sessionID: string): boolean;
@@ -56,9 +55,9 @@ declare module Thrimbletrimmer {
     module Xannathor {
         class Server {
             private app;
-            constructor(hostname: string, port: number, UserListLocation: string, VideosLocation: string, LogFolder: string);
+            constructor(hostname: string, port: number, UserList: Array<string>, VideosLocation: string, LogFolder: string);
             configureServerDefaults(): void;
-            configureAuth(): void;
+            configureAuth(UserList: Array<string>): void;
             configureVideoFunctions(): void;
             newVideo(source: string, options: WubloaderIntegration.video, deleteOnSubmit: boolean, callback: Function): string;
         }

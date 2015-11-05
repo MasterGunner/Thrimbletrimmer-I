@@ -51,7 +51,7 @@ Example return data for the callback function. 'startOffset' and 'endOffset' are
   
 If the contents of the Authenticated User List changes, you can reload it:
 ```
-editor.Utilities.loadAuthorizedUsers()
+Utilities.authorizedUsers = Array<String>
 ``` 
 
 Default video property values:

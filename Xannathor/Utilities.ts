@@ -16,13 +16,14 @@ module Thrimbletrimmer {
 		//Video Input Validation
 		export function validateVideoSubmission (data: WubloaderIntegration.video): boolean { 
 			if(data.vidID && data.startOffset && data.endOffset && data.title && data.description) {
-				if(data.startOffset < data.endOffset && data.title.length <= 91 ) {
-					return true;
-				}
-			}
+				if(data.startOffset < data.endOffset) {
+					if (data.title.length <= 91) {
+						return true;
+					} else { Utilities.log("Failed Validation: Title longer than 91 characters"); } 
+				} else { Utilities.log("Failed Validation: End greater than Start."); } 
+			} else { Utilities.log("Failed Validation: Missing parameter. Require Video ID, Start, End, Title, and Description."); } 
 			
-			Utilities.log("Failed Validation"); 
-			Utilities.log(data.toString())
+			Utilities.log(JSON.stringify(data));
 			return false;
 		}
 		
@@ -31,10 +32,7 @@ module Thrimbletrimmer {
 		//
 		
 		//Set up Authentication
-		var authorizedUsers = [];
-		export function loadAuthorizedUsers(): void {
-			authorizedUsers = fs.readFileSync(Constants.USERLISTLOCATION).toString().split("\n");
-		}
+		export var authorizedUsers = [];
 		
 		//General Authentication
 		export function auth (id_token: string, callback: Function): void {

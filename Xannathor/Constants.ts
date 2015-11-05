@@ -5,7 +5,6 @@ module Thrimbletrimmer {
 		//General
 		export var HOSTNAME: string;
 		export var PORT: number;
-		export var USERLISTLOCATION: string;
 		export var LOGFOLDER: string;
 		
 		//Web page/resource locations
