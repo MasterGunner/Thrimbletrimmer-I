@@ -32,7 +32,7 @@ var Thrimbletrimmer;
         Utilities.log = log;
         function validateVideoSubmission(data) {
             if (data.vidID && data.startOffset && data.endOffset && data.title && data.description) {
-                if (data.startOffset < data.endOffset) {
+                if (parseFloat(data.startOffset.toString()) < parseFloat(data.endOffset.toString())) {
                     if (data.title.length <= 91) {
                         return true;
                     }
@@ -41,7 +41,7 @@ var Thrimbletrimmer;
                     }
                 }
                 else {
-                    Utilities.log("Failed Validation: End greater than Start.");
+                    Utilities.log("Failed Validation: Start greater than End.");
                 }
             }
             else {
@@ -211,11 +211,16 @@ var Thrimbletrimmer;
     var Xannathor;
     (function (Xannathor) {
         var Server = (function () {
-            function Server(hostname, port, UserList, VideosLocation, LogFolder) {
+            function Server(hostname, port, UserList, VideosLocation, LogFolder, APIKey, isDev) {
+                if (typeof isDev === "undefined") {
+                    isDev = false;
+                }
                 Thrimbletrimmer.Constants.HOSTNAME = hostname;
                 Thrimbletrimmer.Constants.PORT = port;
                 Thrimbletrimmer.Constants.VIDEOSLOCATION = VideosLocation;
                 Thrimbletrimmer.Constants.LOGFOLDER = LogFolder;
+                Thrimbletrimmer.Constants.APIKEY = APIKey;
+                Thrimbletrimmer.Constants.ISDEV = (typeof isDev === "undefined") ? false : isDev;
                 this.app = express();
                 this.configureServerDefaults();
                 this.configureAuth(UserList);
@@ -228,17 +233,20 @@ var Thrimbletrimmer;
                 this.app.use(bodyParser.urlencoded({ extended: false }));
                 this.app.use(express.static(Thrimbletrimmer.Constants.EDITORPAGELOCATION));
                 this.app.use(express.static(Thrimbletrimmer.Constants.VIDEOSLOCATION));
-                this.app.get('/', function (req, res) {
-                    var indexPage = '';
-                    Thrimbletrimmer.WubloaderIntegration.getVideos().forEach(function (video) {
-                        indexPage += '<li><a href="/Thrimbletrimmer.html?Video=' + video[0].vidID + '">' + video[0].vidID + '</a></li>';
+                if (Thrimbletrimmer.Constants.ISDEV) {
+                    this.app.get('/', function (req, res) {
+                        var indexPage = '';
+                        Thrimbletrimmer.WubloaderIntegration.getVideos().forEach(function (video) {
+                            indexPage += '<li><a href="/Thrimbletrimmer.html?Video=' + video[0].vidID + '">' + video[0].vidID + '</a></li>';
+                        });
+                        indexPage = '<body><ul>' + indexPage + '</ul></body>';
+                        res.type('html');
+                        res.send(indexPage);
                     });
-                    indexPage = '<body><ul>' + indexPage + '</ul></body>';
-                    res.type('html');
-                    res.send(indexPage);
-                });
+                }
             };
             Server.prototype.configureAuth = function (UserList) {
+                Thrimbletrimmer.Utilities.authorizedUsers = UserList;
                 this.app.post('/tokensignin', function (req, res) {
                     Thrimbletrimmer.Utilities.auth(req.body.id_token, function (isAuth, sessionId) {
                         if (isAuth) {
@@ -251,7 +259,9 @@ var Thrimbletrimmer;
                         }
                     });
                 });
-                Thrimbletrimmer.Utilities.authorizedUsers = UserList;
+                this.app.get('/getGoogleID', function (req, res) {
+                    res.send(Thrimbletrimmer.Constants.APIKEY);
+                });
             };
             Server.prototype.configureVideoFunctions = function () {
                 this.app.get('/getwubs/:a?', function (req, res) {

@@ -154,6 +154,7 @@
 							var posting = $.post(options.submitLoc, data);
 							posting.done(function(data) {
 								alert('Successfully submitted video.\r\n' + data);
+								//window.close();
 							});
 							posting.fail(function(data) {
 								alert('Failed to submit video.\r\n' + data.status+' - '+data.responseText);

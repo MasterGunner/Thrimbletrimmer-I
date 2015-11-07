@@ -1,9 +1,11 @@
 /// <reference path="../../typings/tsd.d.ts" />
 declare module Thrimbletrimmer {
     module Constants {
+        var ISDEV: boolean;
         var HOSTNAME: string;
         var PORT: number;
         var LOGFOLDER: string;
+        var APIKEY: string;
         var EDITORPAGELOCATION: string;
         var VIDEOSLOCATION: string;
         var TYPE: string;
@@ -55,7 +57,7 @@ declare module Thrimbletrimmer {
     module Xannathor {
         class Server {
             private app;
-            constructor(hostname: string, port: number, UserList: Array<string>, VideosLocation: string, LogFolder: string);
+            constructor(hostname: string, port: number, UserList: Array<string>, VideosLocation: string, LogFolder: string, APIKey: string, isDev: boolean);
             configureServerDefaults(): void;
             configureAuth(UserList: Array<string>): void;
             configureVideoFunctions(): void;

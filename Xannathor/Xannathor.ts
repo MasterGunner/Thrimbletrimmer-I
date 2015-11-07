@@ -16,12 +16,16 @@ module Thrimbletrimmer {
 		export class Server {
 			private app: any; //Webserver base.
 			
-			constructor(hostname: string, port: number, UserList:Array<string>, VideosLocation:string, LogFolder:string) {
+			constructor(hostname: string, port: number, UserList:Array<string>, VideosLocation:string, LogFolder:string, APIKey:string, isDev:boolean) {
+				if (typeof isDev === "undefined") { isDev = false; }
+				
 				//Insantiate and configure the base web server.
 				Constants.HOSTNAME = hostname;
 				Constants.PORT = port;
 				Constants.VIDEOSLOCATION = VideosLocation;
 				Constants.LOGFOLDER = LogFolder;
+				Constants.APIKEY = APIKey;
+				Constants.ISDEV = (typeof isDev === "undefined") ? false:isDev;
 				
 				this.app = express();
 				this.configureServerDefaults();
@@ -43,19 +47,24 @@ module Thrimbletrimmer {
 				this.app.use(express.static(Constants.VIDEOSLOCATION)); //Serves the video chunks to edit.
 				
 				//Test Page for development.
-				this.app.get('/', function (req, res) {
-					var indexPage = '';
-					WubloaderIntegration.getVideos().forEach(function(video) {
-						indexPage += '<li><a href="/Thrimbletrimmer.html?Video='+video[0].vidID+'">'+video[0].vidID+'</a></li>'
+				if(Constants.ISDEV) {
+					this.app.get('/', function (req, res) {
+						var indexPage = '';
+						WubloaderIntegration.getVideos().forEach(function(video) {
+							indexPage += '<li><a href="/Thrimbletrimmer.html?Video='+video[0].vidID+'">'+video[0].vidID+'</a></li>'
+						});
+						indexPage = '<body><ul>' + indexPage + '</ul></body>'
+						res.type('html');
+						res.send(indexPage);
 					});
-					indexPage = '<body><ul>' + indexPage + '</ul></body>'
-					res.type('html');
-					res.send(indexPage);
-				});
+				}
 			}
 			
 			configureAuth(UserList:Array<string>): void {
-				//Initial Authentication
+				//Load authenticated user list.
+				Utilities.authorizedUsers = UserList;
+				
+				//Initial Authentication call
 				this.app.post('/tokensignin', function (req, res) {
 					//Utilities.log(req.body);
 					Utilities.auth(req.body.id_token, function(isAuth, sessionId) {
@@ -69,8 +78,10 @@ module Thrimbletrimmer {
 					});
 				});
 				
-				//Load authenticated user list.
-				Utilities.authorizedUsers = UserList;
+				this.app.get('/getGoogleID', function (req, res) {
+					//res.send('345276493482-r84m2giavk10glnmqna0lbq8e1hdaus0.apps.googleusercontent.com');
+					res.send(Constants.APIKEY);
+				});
 			}
 			
 			configureVideoFunctions(): void {
