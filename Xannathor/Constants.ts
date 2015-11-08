@@ -3,11 +3,11 @@
 module Thrimbletrimmer {
 	export module Constants {
 		//General
-		export var ISDEV: boolean;
 		export var HOSTNAME: string;
 		export var PORT: number;
 		export var LOGFOLDER: string;
 		export var APIKEY: string;
+		export var ISDEV: boolean;
 		
 		//Web page/resource locations
 		export var EDITORPAGELOCATION = __dirname + '/EditorPage';

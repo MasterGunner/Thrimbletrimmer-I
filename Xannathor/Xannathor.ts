@@ -79,8 +79,8 @@ module Thrimbletrimmer {
 				});
 				
 				this.app.get('/getGoogleID', function (req, res) {
-					//res.send('345276493482-r84m2giavk10glnmqna0lbq8e1hdaus0.apps.googleusercontent.com');
-					res.send(Constants.APIKEY);
+					if(Utilities.OVERRIDEAUTH) { res.send("AuthOverride"); }
+					else { res.send(Constants.APIKEY); }
 				});
 			}
 			
@@ -119,6 +119,12 @@ module Thrimbletrimmer {
 			//
 			newVideo(source:string, options:WubloaderIntegration.video, deleteOnSubmit:boolean, callback:Function): string {
 				return WubloaderIntegration.newVideo(source, options, deleteOnSubmit, callback);
+			}
+			updateUserList(UserList:Array<string>) {
+				Utilities.authorizedUsers = UserList;
+			}
+			overrideAuth(override:boolean) {
+				Utilities.OVERRIDEAUTH = override;
 			}
 		}
 	}

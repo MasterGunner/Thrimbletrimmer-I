@@ -51,6 +51,7 @@ var Thrimbletrimmer;
             return false;
         }
         Utilities.validateVideoSubmission = validateVideoSubmission;
+        Utilities.OVERRIDEAUTH = false;
         Utilities.authorizedUsers = [];
         function auth(id_token, callback) {
             var authValidation = function (err, body) {
@@ -99,6 +100,9 @@ var Thrimbletrimmer;
         }
         Utilities.generateSessionId = generateSessionId;
         function validateSessionId(sessionID) {
+            if (Utilities.OVERRIDEAUTH) {
+                return true;
+            }
             for (var i = 0; i < sessionIDs.length; i++) {
                 if (sessionIDs[i][0] == sessionID) {
                     return true;
@@ -260,7 +264,12 @@ var Thrimbletrimmer;
                     });
                 });
                 this.app.get('/getGoogleID', function (req, res) {
-                    res.send(Thrimbletrimmer.Constants.APIKEY);
+                    if (Thrimbletrimmer.Utilities.OVERRIDEAUTH) {
+                        res.send("AuthOverride");
+                    }
+                    else {
+                        res.send(Thrimbletrimmer.Constants.APIKEY);
+                    }
                 });
             };
             Server.prototype.configureVideoFunctions = function () {
@@ -295,6 +304,12 @@ var Thrimbletrimmer;
             };
             Server.prototype.newVideo = function (source, options, deleteOnSubmit, callback) {
                 return Thrimbletrimmer.WubloaderIntegration.newVideo(source, options, deleteOnSubmit, callback);
+            };
+            Server.prototype.updateUserList = function (UserList) {
+                Thrimbletrimmer.Utilities.authorizedUsers = UserList;
+            };
+            Server.prototype.overrideAuth = function (override) {
+                Thrimbletrimmer.Utilities.OVERRIDEAUTH = override;
             };
             return Server;
         })();

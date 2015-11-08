@@ -1,11 +1,11 @@
 /// <reference path="../../typings/tsd.d.ts" />
 declare module Thrimbletrimmer {
     module Constants {
-        var ISDEV: boolean;
         var HOSTNAME: string;
         var PORT: number;
         var LOGFOLDER: string;
         var APIKEY: string;
+        var ISDEV: boolean;
         var EDITORPAGELOCATION: string;
         var VIDEOSLOCATION: string;
         var TYPE: string;
@@ -22,6 +22,7 @@ declare module Thrimbletrimmer {
     module Utilities {
         function log(message: string): void;
         function validateVideoSubmission(data: WubloaderIntegration.video): boolean;
+        var OVERRIDEAUTH: boolean;
         var authorizedUsers: any[];
         function auth(id_token: string, callback: Function): void;
         function generateSessionId(): string;
@@ -62,6 +63,8 @@ declare module Thrimbletrimmer {
             configureAuth(UserList: Array<string>): void;
             configureVideoFunctions(): void;
             newVideo(source: string, options: WubloaderIntegration.video, deleteOnSubmit: boolean, callback: Function): string;
+            updateUserList(UserList: Array<string>): void;
+            overrideAuth(override: boolean): void;
         }
     }
 }

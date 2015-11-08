@@ -32,6 +32,7 @@ module Thrimbletrimmer {
 		//
 		
 		//Set up Authentication
+		export var OVERRIDEAUTH = false;
 		export var authorizedUsers = [];
 		
 		//General Authentication
@@ -85,6 +86,7 @@ module Thrimbletrimmer {
 		}
 		
 		export function validateSessionId (sessionID: string): boolean {
+			if(OVERRIDEAUTH) { return true; }
 			for (var i = 0; i < sessionIDs.length; i++) {
 				if(sessionIDs[i][0] == sessionID) {
 					return true;

@@ -9,7 +9,7 @@ var UserList = [];
 //Define hostname, and port.0
 //Provide the list of authenticated users, the directory where videos are stored, and a place to store logs.
 //Provide the Google Client_ID/API Key; and whether to enable Dev features (True = Dev).
-var editor = new Thrimbletrimmer.Xannathor.Server('localhost',1337,UserList,'../Videos', '../logs', 'xxx..apps.googleusercontent.com', true);
+var editor = new Thrimbletrimmer.Xannathor.Server('localhost',1337,UserList,'../Videos', '../logs', 'xxxx.apps.googleusercontent.com', true);
 
 var url= '';
 
