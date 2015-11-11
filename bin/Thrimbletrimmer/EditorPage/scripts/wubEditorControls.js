@@ -39,8 +39,8 @@
 										'</div>' +
 									'</div>');
 			var $editor_fields = $('<div id="EditorDetailsPane" style="clear:both; padding-top:5px;">' +
-										'<div>Title:<br /><input type="text" id="VideoTitle" value="'+options.title+'" maxlength="91" /></div>' +
-										'<div>Description:<br/><textarea id="VideoDescription" >'+options.description+'</textarea></div>' +
+										'<div>Title:<br /><input type="text" id="VideoTitle" value="'+$('<div>').text(options.title).html().replace(/"/g,'&quot;').replace(/'/g,'&#39')+'" maxlength="91" /></div>' +
+										'<div>Description:<br/><textarea id="VideoDescription" >'+$('<div>').text(options.description).html().replace(/"/g,'&quot;').replace(/'/g,'&#39')+'</textarea></div>' +
 										'<input type="button" id="SubmitButton" value="Submit" />' +
 									'</div>');
 			

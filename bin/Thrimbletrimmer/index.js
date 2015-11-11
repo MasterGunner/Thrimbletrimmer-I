@@ -65,7 +65,7 @@ var Thrimbletrimmer;
                 else {
                     var userInfo = body.getPayload();
                     var userEmail = userInfo.email;
-                    if (Utilities.authorizedUsers.indexOf(userEmail) >= 0) {
+                    if (Utilities.authorizedUsers.indexOf(userEmail.toUpperCase()) >= 0) {
                         Utilities.log('User Authenticated: ' + userEmail);
                         callback(true, Utilities.generateSessionId());
                     }
@@ -258,6 +258,9 @@ var Thrimbletrimmer;
                 }
             };
             Server.prototype.configureAuth = function (UserList) {
+                for (var i = 0; i < UserList.length; i++) {
+                    UserList[i] = UserList[i].toUpperCase();
+                }
                 Thrimbletrimmer.Utilities.authorizedUsers = UserList;
                 this.app.post('/tokensignin', function (req, res) {
                     Thrimbletrimmer.Utilities.auth(req.body.id_token, function (isAuth, sessionId) {
@@ -316,6 +319,9 @@ var Thrimbletrimmer;
             };
             Server.prototype.updateUserList = function (UserList) {
                 Thrimbletrimmer.Utilities.OVERRIDEAUTH = (UserList.length) ? false : true;
+                for (var i = 0; i < UserList.length; i++) {
+                    UserList[i] = UserList[i].toUpperCase();
+                }
                 Thrimbletrimmer.Utilities.authorizedUsers = UserList;
             };
             Server.prototype.overrideAuth = function (override) {

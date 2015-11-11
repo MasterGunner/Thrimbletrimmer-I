@@ -62,6 +62,9 @@ module Thrimbletrimmer {
 			
 			configureAuth(UserList:Array<string>): void {
 				//Load authenticated user list.
+				for(var i=0; i<UserList.length; i++) {
+					UserList[i] = UserList[i].toUpperCase();
+				}
 				Utilities.authorizedUsers = UserList;
 				
 				//Initial Authentication call
@@ -124,6 +127,9 @@ module Thrimbletrimmer {
 			}
 			updateUserList(UserList:Array<string>) {
 				Utilities.OVERRIDEAUTH = (UserList.length) ? false:true; //If empty User List, disable Auth.
+				for(var i=0; i<UserList.length; i++) {
+					UserList[i] = UserList[i].toUpperCase();
+				}
 				Utilities.authorizedUsers = UserList;
 			}
 			overrideAuth(override:boolean) {

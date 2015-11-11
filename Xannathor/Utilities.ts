@@ -48,7 +48,7 @@ module Thrimbletrimmer {
 				} else {
 					var userInfo = body.getPayload();
 					var userEmail = userInfo.email;
-					if (authorizedUsers.indexOf(userEmail) >= 0) {
+					if (authorizedUsers.indexOf(userEmail.toUpperCase()) >= 0) {
 						Utilities.log('User Authenticated: '+userEmail);
 						callback(true, Utilities.generateSessionId());
 					} else {
