@@ -22,7 +22,9 @@
 		<span id="g-signin-response"></span>
 		<span id="g-signin-sessionId" style="display:none;"></span>
 		<script type="text/javascript">
+			var gInit = 0;
 			function onGLoad() {
+				gInit = 1;
 				var auth2 = {};
 				$.get('/getGoogleID',function(data) {
 					if (data == "AuthOverride") {
@@ -76,7 +78,7 @@
 			}
 			$(function() {
 				setTimeout(function() {
-					if(typeof(gapi) == 'undefined' || typeof(gapi.auth2) == 'undefined') { onGLoad(); }
+					if(gInit === 0) { onGLoad(); }
 				},500);
 			 });
 		</script>
