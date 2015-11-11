@@ -63,9 +63,10 @@ module Thrimbletrimmer {
 		}
 		
 		//Submits requested edits to the callback function of the associated video, and removes it from the array.
-		export function submitVideo(data: video): boolean {
-			var successfulSubmission = false;
-			if(Utilities.validateVideoSubmission(data)) {
+		export function submitVideo(data: video): Array<any> {
+			var successfulSubmission = [false, 'Unknown Error'];
+			var validation = Utilities.validateVideoSubmission(data);
+			if(validation[0]) {
 				try {
 					for (var i = 0; i < videos.length; i++) {
 						if (videos[i][0].vidID == data.vidID) {
@@ -81,14 +82,15 @@ module Thrimbletrimmer {
 							videos[i][1](data);
 							//Removes the video from the array.
 							if(videos[i][0].deleteOnSubmit) { videos.splice(i,1); }
-							successfulSubmission = true;
+							successfulSubmission = [true];
 							break;
 						}
 					}
 				} catch (err) {
 					Utilities.log(err);
+					successfulSubmission = [false, err]
 				}
-			}
+			} else { successfulSubmission = [false, validation[1]]; }
 			return successfulSubmission
 		}
 	}

@@ -74,6 +74,11 @@
 				$('#Sign-in').show();
 				$('#EditorContent').hide();
 			}
+			$(function() {
+				setTimeout(function() {
+					if(typeof(gapi) == 'undefined' || typeof(gapi.auth2) == 'undefined') { onGLoad(); }
+				},500);
+			 });
 		</script>
 	</div>
 	<div style="float:right;">

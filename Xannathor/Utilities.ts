@@ -14,17 +14,19 @@ module Thrimbletrimmer {
 		}
 		
 		//Video Input Validation
-		export function validateVideoSubmission (data: WubloaderIntegration.video): boolean { 
+		export function validateVideoSubmission (data: WubloaderIntegration.video): Array<any> { 
+			var validation = [false, "Unkown Error"];
 			if(data.vidID && data.startOffset && data.endOffset && data.title && data.description) {
 				if(parseFloat(data.startOffset.toString()) < parseFloat(data.endOffset.toString())) {
 					if (data.title.length <= 91) {
-						return true;
-					} else { Utilities.log("Failed Validation: Title longer than 91 characters"); } 
-				} else { Utilities.log("Failed Validation: Start greater than End."); } 
-			} else { Utilities.log("Failed Validation: Missing parameter. Require Video ID, Start, End, Title, and Description."); } 
+						return [true];
+					} else { validation = [false, "Failed Validation: Title longer than 91 characters"]; } 
+				} else { validation = [false, "Failed Validation: Start greater than End."]; } 
+			} else { validation = [false, "Failed Validation: Missing parameter. Require Video ID, Start, End, Title, and Description."]; } 
 			
+			Utilities.log(validation[1].toString());
 			Utilities.log(JSON.stringify(data));
-			return false;
+			return validation;
 		}
 		
 		//
@@ -92,6 +94,7 @@ module Thrimbletrimmer {
 					return true;
 				}
 			}
+			log("Failed to validate session key: " + sessionID);
 			return false;
 		}
 		

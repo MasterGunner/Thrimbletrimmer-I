@@ -92,10 +92,10 @@ module Thrimbletrimmer {
 						if(videoData) {
 							res.json(videoData);
 						} else {
-							res.sendStatus(404);
+							res.status(400).send('Unable to retrieve video.');
 						}
 					} else {
-						res.sendStatus(401);
+						res.status(401).send('Cannot validate session, please refresh and try again.');
 					}
 				});
 				
@@ -103,13 +103,15 @@ module Thrimbletrimmer {
 				this.app.post('/setwubs', function (req, res) {
 					Utilities.log("Recieved Edit Request");
 					if(Utilities.validateSessionId(req.body["extraMetadata[0][SessionId]"])) {
-						if (WubloaderIntegration.submitVideo(req.body)) {
-							res.send('Recieved Video Edits');
+						//really should handle this with promises
+						var submission = WubloaderIntegration.submitVideo(req.body);
+						if (submission[0]) {
+							res.send('Received Video Edits');
 						} else {
-							res.sendStatus(500);
+							res.status(400).send(submission[1]);
 						}
 					} else {
-						res.sendStatus(401);
+						res.status(401).send('Cannot validate session. Please refresh and try again.');
 					}
 				});
 			}
@@ -121,6 +123,7 @@ module Thrimbletrimmer {
 				return WubloaderIntegration.newVideo(source, options, deleteOnSubmit, callback);
 			}
 			updateUserList(UserList:Array<string>) {
+				Utilities.OVERRIDEAUTH = (UserList.length) ? false:true; //If empty User List, disable Auth.
 				Utilities.authorizedUsers = UserList;
 			}
 			overrideAuth(override:boolean) {

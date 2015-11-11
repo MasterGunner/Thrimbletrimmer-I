@@ -31,24 +31,26 @@ var Thrimbletrimmer;
         }
         Utilities.log = log;
         function validateVideoSubmission(data) {
+            var validation = [false, "Unkown Error"];
             if (data.vidID && data.startOffset && data.endOffset && data.title && data.description) {
                 if (parseFloat(data.startOffset.toString()) < parseFloat(data.endOffset.toString())) {
                     if (data.title.length <= 91) {
-                        return true;
+                        return [true];
                     }
                     else {
-                        Utilities.log("Failed Validation: Title longer than 91 characters");
+                        validation = [false, "Failed Validation: Title longer than 91 characters"];
                     }
                 }
                 else {
-                    Utilities.log("Failed Validation: Start greater than End.");
+                    validation = [false, "Failed Validation: Start greater than End."];
                 }
             }
             else {
-                Utilities.log("Failed Validation: Missing parameter. Require Video ID, Start, End, Title, and Description.");
+                validation = [false, "Failed Validation: Missing parameter. Require Video ID, Start, End, Title, and Description."];
             }
+            Utilities.log(validation[1].toString());
             Utilities.log(JSON.stringify(data));
-            return false;
+            return validation;
         }
         Utilities.validateVideoSubmission = validateVideoSubmission;
         Utilities.OVERRIDEAUTH = false;
@@ -108,6 +110,7 @@ var Thrimbletrimmer;
                     return true;
                 }
             }
+            log("Failed to validate session key: " + sessionID);
             return false;
         }
         Utilities.validateSessionId = validateSessionId;
@@ -171,8 +174,9 @@ var Thrimbletrimmer;
         }
         WubloaderIntegration.getVideo = getVideo;
         function submitVideo(data) {
-            var successfulSubmission = false;
-            if (Thrimbletrimmer.Utilities.validateVideoSubmission(data)) {
+            var successfulSubmission = [false, 'Unknown Error'];
+            var validation = Thrimbletrimmer.Utilities.validateVideoSubmission(data);
+            if (validation[0]) {
                 try {
                     for (var i = 0; i < videos.length; i++) {
                         if (videos[i][0].vidID == data.vidID) {
@@ -187,14 +191,18 @@ var Thrimbletrimmer;
                             if (videos[i][0].deleteOnSubmit) {
                                 videos.splice(i, 1);
                             }
-                            successfulSubmission = true;
+                            successfulSubmission = [true];
                             break;
                         }
                     }
                 }
                 catch (err) {
                     Thrimbletrimmer.Utilities.log(err);
+                    successfulSubmission = [false, err];
                 }
+            }
+            else {
+                successfulSubmission = [false, validation[1]];
             }
             return successfulSubmission;
         }
@@ -280,25 +288,26 @@ var Thrimbletrimmer;
                             res.json(videoData);
                         }
                         else {
-                            res.sendStatus(404);
+                            res.status(400).send('Unable to retrieve video.');
                         }
                     }
                     else {
-                        res.sendStatus(401);
+                        res.status(401).send('Cannot validate session, please refresh and try again.');
                     }
                 });
                 this.app.post('/setwubs', function (req, res) {
                     Thrimbletrimmer.Utilities.log("Recieved Edit Request");
                     if (Thrimbletrimmer.Utilities.validateSessionId(req.body["extraMetadata[0][SessionId]"])) {
-                        if (Thrimbletrimmer.WubloaderIntegration.submitVideo(req.body)) {
-                            res.send('Recieved Video Edits');
+                        var submission = Thrimbletrimmer.WubloaderIntegration.submitVideo(req.body);
+                        if (submission[0]) {
+                            res.send('Received Video Edits');
                         }
                         else {
-                            res.sendStatus(500);
+                            res.status(400).send(submission[1]);
                         }
                     }
                     else {
-                        res.sendStatus(401);
+                        res.status(401).send('Cannot validate session. Please refresh and try again.');
                     }
                 });
             };
@@ -306,6 +315,7 @@ var Thrimbletrimmer;
                 return Thrimbletrimmer.WubloaderIntegration.newVideo(source, options, deleteOnSubmit, callback);
             };
             Server.prototype.updateUserList = function (UserList) {
+                Thrimbletrimmer.Utilities.OVERRIDEAUTH = (UserList.length) ? false : true;
                 Thrimbletrimmer.Utilities.authorizedUsers = UserList;
             };
             Server.prototype.overrideAuth = function (override) {

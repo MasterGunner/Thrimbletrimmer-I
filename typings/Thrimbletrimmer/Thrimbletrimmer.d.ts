@@ -21,7 +21,7 @@ declare var GoogleAuth: any;
 declare module Thrimbletrimmer {
     module Utilities {
         function log(message: string): void;
-        function validateVideoSubmission(data: WubloaderIntegration.video): boolean;
+        function validateVideoSubmission(data: WubloaderIntegration.video): Array<any>;
         var OVERRIDEAUTH: boolean;
         var authorizedUsers: any[];
         function auth(id_token: string, callback: Function): void;
@@ -49,7 +49,7 @@ declare module Thrimbletrimmer {
         function newVideo(source: string, options: video, deleteOnSubmit: boolean, callback: Function): string;
         function getVideos(): Array<[video, Function]>;
         function getVideo(videoId: string): video;
-        function submitVideo(data: video): boolean;
+        function submitVideo(data: video): Array<any>;
     }
 }
 declare var express: any;

@@ -56,8 +56,12 @@ Example return data for the callback function. 'startOffset' and 'endOffset' are
   
 If the contents of the Authenticated User List changes, you can reload it:
 ```
-Utilities.authorizedUsers = Array<String>
+editor.updateUserList(UserList);
 ``` 
+Disable Google Authentication using:
+```
+editor.overrideAuth(true);
+```
 
 Default video property values:
 * type: "video/mp4"
