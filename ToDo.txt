@@ -1,10 +1,20 @@
 Error handling!
 
 For Next Year:
-Re-implement Thrimbletrimmer in AngularJS.
-Convert the Thrimbletrimmer front-end to typescript.
 Combine Eustace Web page and plug into a more cohesive single whole - less content generated on page load. Mainly, stick the Web player and controls in the actual html.
+	Re-implement Thrimbletrimmer in AngularJS.
+	Convert the Thrimbletrimmer front-end to typescript.
+
 Better UI.
+	Have something happen to the screen on submit. If closing the window still isn't an option, change the screen to a smiley face picture or something.
+	Better adjust time controls.
+		<Sokar> Gunner for next year: plus / minus signs next to the times for jumping 10 frames at a a time and the video auto-jumps when you hit it
+	Validation to prevent URLs in title.
+	Have a "Confirm/Cancel" submit button.
+		->Validate and prompt if either of the trim points haven't being changed.
+	Controls to adjust audio sync on the fly.
+		->Would have to split video and audio into separate elements, and link the controls.
+
 Properly do session handling.
 Move the Google Client ID to be something passed in from Xannathor on page load, so it can be passed into the constructor.
 Split up Auth and Video functions into their own module (rather than Utilities and Wubloader Integration)

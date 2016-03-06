@@ -140,8 +140,10 @@
 					
 					//Configure submit button
 					$wub_editor_Submit.click(function() {
+						$wub_editor_Submit.prop("disabled",true);
 						if(startSeconds >= endSeconds) {
 							alert("End Time must be greater than Start Time");
+							$wub_editor_Submit.prop("disabled",false);
 						} else {
 							var data = {
 								vidID:options.vidID,
@@ -158,6 +160,7 @@
 							});
 							posting.fail(function(data) {
 								alert('Failed to submit video.\r\n' + data.status+' - '+data.responseText);
+								$wub_editor_Submit.prop("disabled",false);
 							});
 						}
 					});
